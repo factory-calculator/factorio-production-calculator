@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171a1d">
+<meta name="description" content="Factorio向けの生産計算機。通常版とSpace Ageに対応。">
+<title>Factorio Production Calculator</title>
+<style>
+:root{color-scheme:dark;--bg:#171a1d;--surface:#202428;--surface-hover:#282e33;--border:#383f44;--text:#e6e8e9;--muted:#a0a7ac;--accent:#d58a38;--accent-hover:#e49a49}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(900px,calc(100% - 40px));margin:0 auto}
+header{height:62px;border-bottom:1px solid var(--border);display:flex;align-items:center;background:#191d20}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{font-size:14px;font-weight:650;letter-spacing:.02em}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:22px;font-size:13px;color:var(--muted)}
+nav a:hover{color:var(--text)}
+main{padding:58px 0 72px}
+.intro{margin-bottom:38px}
+.kicker{font-size:12px;color:var(--accent);font-weight:650;letter-spacing:.08em;margin-bottom:8px}
+h1{font-size:clamp(27px,4vw,36px);line-height:1.25;letter-spacing:-.02em;margin:0 0 10px;font-weight:650}
+.intro p{margin:0;color:var(--muted);font-size:14px}
+.section-title{font-size:15px;font-weight:650;margin:0 0 13px}
+.editions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edition{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:5px;transition:background .15s,border-color .15s}
+.edition:hover{background:var(--surface-hover);border-color:#59636a}
+.edition h2{font-size:17px;font-weight:650;margin:0 0 3px}
+.edition p{font-size:12px;color:var(--muted);margin:0}
+.arrow{color:var(--accent);font-size:20px;flex:none}
+.info{margin-top:48px;padding-top:22px;border-top:1px solid var(--border)}
+.info h2{font-size:14px;margin:0 0 8px;font-weight:650}
+.info p{font-size:12px;color:var(--muted);margin:0;max-width:720px}
+footer{border-top:1px solid var(--border);padding:18px 0;color:#858d92;font-size:11px}
+.footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+@media(max-width:600px){.wrap{width:calc(100% - 30px)}header{height:56px}.logo{font-size:12px}nav{gap:13px;font-size:11px}main{padding:42px 0 58px}.editions{grid-template-columns:1fr}.edition{padding:17px}.info{margin-top:38px}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="logo" href="index.html">FACTORIO <span>/</span> PRODUCTION CALCULATOR</a><nav><a href="#calculator">計算機</a><a href="#about">このサイトについて</a></nav></div></header>
+<main class="wrap">
+<section class="intro">
+<div class="kicker">PRODUCTION CALCULATOR</div>
+<h1>Factorio 生産計算機</h1>
+<p>必要な素材や設備の数を計算できます。</p>
+</section>
+<section id="calculator">
+<h2 class="section-title">エディションを選択</h2>
+<div class="editions">
+<a class="edition" href="calculator.html#normal" data-edition="normal"><div><h2>通常版</h2><p>Factorio 本編</p></div><span class="arrow">›</span></a>
+<a class="edition" href="calculator.html#space" data-edition="space"><div><h2>Space Age</h2><p>拡張版</p></div><span class="arrow">›</span></a>
+</div>
+</section>
+<section class="info" id="about">
+<h2>このサイトについて</h2>
+<p>Factorio向けの非公式ファンメイドツールです。Factorioおよび関連コンテンツの権利は各権利者に帰属します。Wube Softwareとは提携・承認関係にありません。</p>
+</section>
+</main>
+<footer><div class="wrap footer"><span>Factorio Production Calculator</span><span>Unofficial fan-made tool</span></div></footer>
+<script>
+document.querySelectorAll('[data-edition]').forEach(link=>link.addEventListener('click',()=>{try{sessionStorage.setItem('factorioEdition',link.dataset.edition)}catch(e){}}));
+</script>
+</body>
+</html>
