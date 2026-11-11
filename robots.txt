@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hinatasato101008-web.github.io/factorio-production-calculator/sitemap.xml
+Sitemap: https://factory-calculator.github.io/factorio-production-calculator/sitemap.xml
