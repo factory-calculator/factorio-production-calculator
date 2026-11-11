@@ -4,10 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14191d">
-<meta name="description" content="Factorio向けの生産計算機。通常版とSpace Ageに対応。必要素材、設備数、生産ラインを計算できます。">
+<meta name="description" content="Factorioの生産計画を立てる無料の非公式計算機。通常版とSpace Ageに対応し、必要素材や製造設備を計算できます。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://factory-calculator.github.io/factorio-production-calculator/">
+<link rel="alternate" hreflang="ja" href="https://factory-calculator.github.io/factorio-production-calculator/">
+<link rel="alternate" hreflang="en" href="https://factory-calculator.github.io/factorio-production-calculator/en/">
+<link rel="alternate" hreflang="x-default" href="https://factory-calculator.github.io/factorio-production-calculator/en/">
 <meta property="og:title" content="Factorio Production Calculator">
 <meta property="og:description" content="Factorio向けの生産計算機。通常版とSpace Ageに対応。">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://factory-calculator.github.io/factorio-production-calculator/">
+<meta name="twitter:card" content="summary">
 <title>Factorio Production Calculator</title>
 <style>
 :root{color-scheme:dark;--bg:#121619;--surface:#1b2226;--surface2:#20292e;--line:#354149;--text:#edf1f2;--muted:#a4afb5;--accent:#df913d;--accent2:#f0ad5d;--green:#83b99b}
@@ -21,9 +28,10 @@ main{padding:72px 0 82px}.hero{position:relative;padding:52px 48px 46px;border:1
 footer{border-top:1px solid var(--line);padding:20px 0;color:#859198;font-size:10px}.footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
 @media(max-width:650px){.wrap{width:calc(100% - 28px)}header{height:auto;min-height:58px}.nav{padding:12px 0;align-items:flex-start;flex-direction:column;gap:8px}nav{gap:16px;flex-wrap:wrap}.nav nav{font-size:11px}main{padding:35px 0 55px}.hero{padding:34px 22px 30px}.hero:after{width:190px;height:190px;right:-90px;top:-30px}.editions{grid-template-columns:1fr}.edition{min-height:125px;padding:20px}.utility-grid{grid-template-columns:1fr}.feedback{align-items:stretch;flex-direction:column;padding:19px}.feedback-link{width:100%}.section{margin-top:32px}.section-head{align-items:flex-start;flex-direction:column;gap:3px}}
 </style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Factorio Production Calculator","url":"https://factory-calculator.github.io/factorio-production-calculator/","inLanguage":"ja","description":"Factorio向けの非公式生産計画・生産量計算ツール"}</script>
 </head>
 <body>
-<header><div class="wrap nav"><a class="logo" href="index.html">FACTORIO <span>/</span> PRODUCTION CALCULATOR</a><nav><a href="#calculator">計算機</a><a href="guide.html">使い方・FAQ</a><a href="updates.html">更新履歴</a><a href="#about">サイト情報</a></nav></div></header>
+<header><div class="wrap nav"><a class="logo" href="index.html">FACTORIO <span>/</span> PRODUCTION CALCULATOR</a><nav><a href="#calculator">計算機</a><a href="guide.html">使い方・FAQ</a><a href="updates.html">更新履歴</a><a href="#about">サイト情報</a><a href="en/">EN</a></nav></div></header>
 <main class="wrap">
 <section class="hero"><div class="eyebrow">FACTORIO TOOL / PRODUCTION PLANNING</div><h1>生産ラインを、<br>もっと正確に。</h1><p>目標の生産量から必要な素材・製造設備を計算。Factorio本編とSpace Age、それぞれの環境に合わせて生産計画を立てられます。</p><div class="hero-meta"><span class="chip">STANDARD EDITION</span><span class="chip">SPACE AGE</span><span class="chip">PRODUCTION ANALYSIS</span></div></section>
 <section class="section" id="calculator"><div class="section-head"><h2>エディションを選択</h2><p>プレイ環境に合った計算機を選んでください。</p></div><div class="editions">
@@ -38,6 +46,6 @@ footer{border-top:1px solid var(--line);padding:20px 0;color:#859198;font-size:1
 <section class="feedback" aria-label="ご意見・不具合報告"><div><h2>ご意見・不具合報告</h2><p>改善案や不具合など、お気軽にお知らせください。</p></div><a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeicCFZg_ION3U-59g-nzDuyC6cvGMyNp0Dn84MS3tAoDEKsQ/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">フォームを開く ↗</a></section>
 <section class="about" id="about"><h2>このサイトについて</h2><p>Factorio向けの非公式ファンメイドツールです。Factorioおよび関連コンテンツの権利は各権利者に帰属します。Wube Softwareとは提携・承認関係にありません。</p></section>
 </main>
-<footer><div class="wrap footer"><span>Factorio Production Calculator</span><span><a href="guide.html">ガイド</a>　·　<a href="updates.html">更新履歴</a>　·　Unofficial fan-made tool</span></div></footer>
+<footer><div class="wrap footer"><span>Factorio Production Calculator</span><span><a href="guide.html">ガイド</a>　·　<a href="updates.html">更新履歴</a>　·　<a href="en/">English</a>　·　Unofficial fan-made tool</span></div></footer>
 <script>document.querySelectorAll('[data-edition]').forEach(link=>link.addEventListener('click',()=>{try{sessionStorage.setItem('factorioEdition',link.dataset.edition)}catch(e){}}));</script>
 </body></html>
