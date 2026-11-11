@@ -866,10 +866,10 @@ button{font-weight:600}
     const all = [...producible, ...rawOnly];
     const filtered = all.filter(item => {
       const materialText = item.recipe ? Object.keys(item.recipe.in || {}).join(" ") : "";
-      const matchesText = !query ||
-        item.name.toLocaleLowerCase("ja").includes(query) ||
-        materialText.toLocaleLowerCase("ja").includes(query) ||
-        (item.recipe?.id || "").toLocaleLowerCase("ja").includes(query);
+      const searchValues = [item.name, ...Object.keys(item.recipe?.in || {}), item.recipe?.id || ""];
+      const matchesText = !query || (window.__enSearchMatch
+        ? window.__enSearchMatch(searchValues, query)
+        : searchValues.join(" ").toLocaleLowerCase().includes(query));
       const matchesCategory = category === "all" ||
         (category === "raw" ? item.kind === "raw" : item.category === category);
       return matchesText && matchesCategory;
@@ -926,7 +926,7 @@ button{font-weight:600}
     const old = $("target").value;
     const filtered = state.recipes.filter(r => 
       !isSpaceAgeRecipe(r) &&
-      (!q || window.__enSearchMatch([r.name, r.id, ...Object.keys(r.in || {}), itemCategory(r), r.planet || ""], q)) &&
+      (!q || (window.__enSearchMatch ? window.__enSearchMatch([r.name, r.id, ...Object.keys(r.in || {}), itemCategory(r), r.planet || ""], q) : [r.name, r.id, ...Object.keys(r.in || {}), itemCategory(r), r.planet || ""].join(" ").toLowerCase().includes(q))) &&
       (cat === "all" || itemCategory(r) === cat)
     );
 
