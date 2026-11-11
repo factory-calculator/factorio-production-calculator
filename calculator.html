@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10151d">
+<meta name="description" content="Factorioの通常版・Space Age版に対応した生産計算機。目標生産量から必要素材や製造設備を計算します。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://factory-calculator.github.io/factorio-production-calculator/calculator.html">
+<meta property="og:title" content="Factorio Production Calculator">
+<meta property="og:description" content="Factorio base game and Space Age production calculator.">
 <title>Factorio 生産計算機 v7.4</title>
 <style>
 :root{--shell:#171b1f;--shell-line:#343b42}
@@ -11,7 +16,7 @@
 html,body{margin:0;width:100%;height:100%;background:var(--shell);color:#e5e7e9;font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;font-feature-settings:"palt"}
 body{display:flex;flex-direction:column;overflow:hidden}
 .topbar{flex:0 0 auto;background:#20252a;border-bottom:1px solid var(--shell-line);padding:9px 14px;display:flex;align-items:center;gap:14px;z-index:5}
-.brand{font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI",sans-serif;font-weight:650;font-size:14px;white-space:nowrap;color:#e5e7e9}
+.language-link{margin-left:auto;color:#f0ad5d;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap}.brand{font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI",sans-serif;font-weight:650;font-size:14px;white-space:nowrap;color:#e5e7e9}
 .tabs{display:flex;gap:6px;flex:1;min-width:0}
 .tab{font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI",sans-serif;appearance:none;border:1px solid #46505a;background:#292f35;color:#d4d9dd;border-radius:4px;padding:8px 14px;font:600 13px system-ui;cursor:pointer}
 .tab[aria-selected="true"]{background:#a66b28;border-color:#a66b28;color:#fff}
@@ -24,6 +29,7 @@ body{display:flex;flex-direction:column;overflow:hidden}
 <body>
 <header class="topbar">
   <div class="brand">Factorio 生産計算機 <span style="color:#9aabba;font-weight:500">v7.4</span></div>
+  <a class="language-link" href="en/">EN</a>
   <nav class="tabs" aria-label="計算機の種類">
     <button class="tab" type="button" data-page="normal" aria-selected="true">通常版</button>
     <button class="tab" type="button" data-page="space" aria-selected="false">Space Age版</button>
