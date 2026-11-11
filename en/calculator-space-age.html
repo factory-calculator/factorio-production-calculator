@@ -1,0 +1,1687 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">\n<meta name="description" content="Free unofficial Factorio Space Age production calculator. Plan materials, machines, and production rates.">\n<meta name="robots" content="index,follow">\n<link rel="canonical" href="https://factory-calculator.github.io/factorio-production-calculator/en/calculator-space-age.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Factorio Production Calculator - Space Age</title>
+<style>
+:root{--bg:#10151d;--panel:#192330;--panel2:#202d3b;--line:#344456;--text:#edf3f8;--muted:#9aabba;--accent:#e6a23c;--green:#7fc79a;--blue:#79b8e8;--red:#e58b8b}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0e141c,#17212c);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:28px max(20px,calc((100% - 1180px)/2));border-bottom:1px solid var(--line);background:#141d28;display:flex;justify-content:space-between;align-items:center}
+h1{margin:0 0 6px;font-size:clamp(23px,4vw,34px)}header p{margin:0;color:var(--muted)}
+main{max-width:1180px;margin:24px auto;padding:0 18px 60px;display:grid;gap:18px}
+.page{display:grid;gap:18px}.analysis-panel{padding-bottom:20px}.analysis-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid var(--line)}.analysis-tab{background:#263545;border-color:#40546a;min-width:0;padding:9px 14px}.analysis-tab.active{background:#9a641d;border-color:#c68b38;color:#fff}.analysis-view{min-height:90px}.analysis-view h3{margin-bottom:12px}.page-tabs{max-width:1180px;margin:18px auto 0;padding:0 18px;display:flex;gap:8px}.page-tab{background:#263545;border-color:#40546a;min-width:130px}.page-tab.active{background:#9a641d;border-color:#c68b38}.page-tabs a{text-decoration:none;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 10px 30px #0002}
+h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px;color:var(--blue)}
+.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+label{display:grid;gap:6px;color:var(--muted);font-size:13px}
+.quick{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:13px}
+.quickbtn{padding:6px 10px;font-size:13px;background:#263545;border-color:#40546a}
+.quickbtn:hover,.quickbtn.active{border-color:var(--accent);background:#49371f}
+#target{max-height:240px}
+#matchCount{font-size:12px}
+
+#supportedItemsTable{width:100%;border-collapse:collapse;font-size:13px}
+#supportedItemsTable th,#supportedItemsTable td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+#supportedItemsTable th{color:var(--muted);font-weight:650}
+#supportedItemsTable .item-name{font-weight:700}.item-icon{width:40px;height:40px;object-fit:contain;vertical-align:middle;margin-right:9px;border-radius:6px;background:#101923;padding:3px}.item-fallback{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;vertical-align:middle;margin-right:9px;border-radius:6px;background:#29394a;color:#e6a23c;font-weight:800;font-size:11px}.catalog-item-cell{display:flex;align-items:center;min-width:150px}
+#supportedItemsTable .item-detail{color:var(--muted);font-size:12px;line-height:1.5}
+.catalog-toolbar{display:grid;grid-template-columns:minmax(180px,2fr) minmax(150px,1fr);gap:10px;margin:12px 0}
+.catalog-wrap{overflow-x:auto}
+.catalog-count{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;color:var(--muted);font-size:13px}
+.catalog-tag{display:inline-block;padding:2px 7px;border:1px solid var(--line);border-radius:99px;font-size:11px;color:var(--muted);white-space:nowrap}
+@media(max-width:600px){.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.diagnostic-row{grid-template-columns:1fr auto}.diagnostic-track{grid-column:1/-1;grid-row:2}.layout-table{font-size:12px}.layout-table th,.layout-table td{padding:7px 5px}.page-tabs{margin-top:12px}.page-tab{flex:1;min-width:0;padding:9px 6px}.catalog-toolbar{grid-template-columns:1fr}#supportedItemsTable{font-size:12px}#supportedItemsTable th,#supportedItemsTable td{padding:8px 6px}}
+
+input,select,button,textarea{font:inherit;color:var(--text);background:#101923;border:1px solid var(--line);border-radius:8px;padding:10px;min-width:0}
+input:focus,select:focus,textarea:focus{outline:2px solid #e6a23c66;border-color:var(--accent)}
+button{cursor:pointer;background:#9a641d;border-color:#c68b38;font-weight:650}
+button.secondary{background:#263545;border-color:#40546a}
+button.danger{background:#8b2525;border-color:#b83b3b}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat{padding:13px;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+.stat small{display:block;color:var(--muted)}.stat strong{font-size:22px}
+.resultgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tree{display:grid;gap:12px}
+.tree-legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:12px}
+.tree-legend span{display:flex;align-items:center;gap:6px}
+.legend-dot{width:9px;height:9px;border-radius:50%;display:inline-block;background:#79b8e8}
+.legend-dot.final{background:#e6a23c}.legend-dot.raw{background:#7fc79a}
+.tree-root{max-width:100%;margin:auto}
+.tree-root-title{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 15px;background:#49371f;border:1px solid #c68b38;border-radius:10px}
+.tree-branch{margin:10px 0 0 18px;padding:0 0 0 18px;border-left:2px solid #526579;display:grid;gap:10px}
+.tree-item{position:relative;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.tree-item:before{content:"";position:absolute;left:-20px;top:20px;width:18px;border-top:2px solid #526579}
+.tree-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tree-head b{overflow-wrap:anywhere}
+.tree-qty{font-variant-numeric:tabular-nums;white-space:nowrap;color:#f3d39c;font-weight:700}
+.tree-machine{margin-top:4px;color:var(--muted);font-size:12px}
+.tree-item.raw-item{background:#1d332b;border-color:#426b55}
+.tree-item.raw-item .tree-qty{color:#a9e2ba}
+.tree-item.raw-item:before{border-color:#668d73}
+.tree-item.final-item{border-color:#c68b38}
+.tree-item .tree-branch{margin-top:9px}
+.tree-label{font-size:11px;color:var(--muted);margin-right:6px}
+.note{color:var(--muted);font-size:13px}.warn{color:#f0c17b}.error{color:var(--red)}
+.hidden{display:none !important}
+.admin-badge{cursor:pointer;padding:6px 12px;font-size:13px;border-radius:20px;background:#202d3b;border:1px solid var(--line);color:var(--muted)}
+.admin-badge:hover{color:var(--accent);border-color:var(--accent)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:flex;justify-content:center;align-items:center;z-index:1000;padding:20px;backdrop-filter:blur(3px)}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px #0008}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.modal-header h2{margin:0;color:var(--accent)}
+.close-btn{background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;padding:4px 8px;line-height:1}
+.close-btn:hover{color:var(--text)}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.admin-section{margin-bottom:20px;padding:14px;background:var(--panel2);border-radius:10px;border:1px solid var(--line)}
+.admin-section h3{margin-top:0}
+.form-group{display:grid;gap:8px;margin-bottom:12px}
+ .settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.module-grid{margin-top:10px}.diagnostic-list{display:grid;gap:9px}.diagnostic-row{display:grid;grid-template-columns:minmax(110px,1fr) minmax(90px,2fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.diagnostic-row:last-child{border-bottom:0}.diagnostic-track{height:9px;border-radius:8px;background:#0c131b;overflow:hidden}.diagnostic-fill{height:100%;background:var(--blue);border-radius:8px}.diagnostic-fill.warn{background:var(--red)}.layout-table{width:100%;border-collapse:collapse}.layout-table th,.layout-table td{padding:9px;border-bottom:1px solid var(--line);text-align:left}.layout-table td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bar-row{display:grid;grid-template-columns:minmax(75px,1fr) 2fr auto;gap:9px;align-items:center;margin:8px 0;font-size:12px}
+.bar-track{height:12px;background:#101923;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--blue);border-radius:99px}
+.bar-fill.raw-fill{background:var(--green)}
+.plan-table input{width:115px}
+.notice{padding:10px 12px;border:1px solid #8b6b36;background:#3b301e;border-radius:8px;color:#f0d39b;font-size:12px}
+
+/* 改善点: アラートバナー用のスタイル */
+.status-banner{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:14px;border:1px solid var(--line);background:var(--panel2);transition:all 0.2s ease}
+.status-banner.info{border-color:#40546a;color:var(--muted)}
+.status-banner.success{border-color:#426b55;background:#1d332b;color:#a9e2ba}
+.status-banner.error{border-color:#b83b3b;background:#3b1e1e;color:#f07b7b}
+
+@media(max-width:800px){.settings-grid,.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.resultgrid{grid-template-columns:1fr}}
+@media(max-width:480px){.settings-grid,.controls,.stats{grid-template-columns:1fr}.panel{padding:14px}table{font-size:12px}th,td{padding:7px 5px}}
+
+/* v7.4 visual redesign — presentation only; calculation logic and data remain unchanged */
+:root{--bg:#0b1118;--panel:#151f2a;--panel2:#1c2a37;--line:#304253;--text:#edf3f8;--muted:#9aabba;--accent:#54b8d0;--green:#79c99a;--blue:#79b8e8;--red:#e58b8b;--surface:#111a23;--accent-deep:#277f98}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(ellipse at 50% -18%,#263849 0%,#101923 42%,#0b1118 78%);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.005em}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,black,transparent 78%);z-index:-1}
+header{position:relative;padding:24px max(20px,calc((100% - 1180px)/2));background:linear-gradient(110deg,#172431f5,#111b26f2);border-bottom:1px solid #405466;box-shadow:0 8px 30px #0003}
+header::after{content:"";position:absolute;left:max(20px,calc((100% - 1180px)/2));right:max(20px,calc((100% - 1180px)/2));bottom:-1px;height:2px;background:linear-gradient(90deg,var(--accent),transparent 72%);opacity:.8}
+h1{font-size:clamp(22px,3.5vw,31px);font-weight:780;letter-spacing:.015em}
+header p{font-size:13px;letter-spacing:.04em}
+.brand-divider{color:var(--accent);padding:0 5px;font-weight:400}
+main{max-width:1220px;gap:16px;margin:22px auto;padding:0 20px 64px}
+.page-tabs{max-width:1220px;margin:16px auto 0;padding:0 20px;gap:9px}
+.page-tab{min-width:138px;padding:10px 16px;background:#172431;border:1px solid #35495b;border-radius:9px;color:#bdcbd7;font-size:13px;font-weight:650;transition:background .16s,border-color .16s,transform .16s}
+.page-tab:hover{border-color:var(--accent);background:#223342;transform:translateY(-1px)}
+.page-tab.active{background:linear-gradient(135deg,var(--accent-deep),#344555);border-color:var(--accent);color:#fff;box-shadow:inset 0 1px #ffffff20,0 3px 12px #0002}
+.page-tabs a{color:inherit}
+.panel{background:linear-gradient(145deg,#192633f5,#131e29f5);border:1px solid #344858;border-radius:13px;padding:20px;box-shadow:0 8px 24px #0003,inset 0 1px #ffffff08;backdrop-filter:blur(8px)}
+.panel h2{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:750;letter-spacing:.025em;margin-bottom:17px}
+.panel h2::before{content:"";width:3px;height:18px;border-radius:3px;background:var(--accent);box-shadow:0 0 12px color-mix(in srgb,var(--accent) 40%,transparent)}
+h3{color:var(--accent);font-weight:700;letter-spacing:.02em}
+.controls,.settings-grid{gap:13px}
+label{font-size:12px;font-weight:650;letter-spacing:.025em;color:#b3c2ce;gap:7px}
+input,select,textarea{background:#0c151e;border:1px solid #35495a;border-radius:8px;padding:11px 12px;min-height:42px;transition:border-color .16s,box-shadow .16s,background .16s}
+input:hover,select:hover,textarea:hover{border-color:#60788b}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);background:#101d28}
+button{background:linear-gradient(135deg,var(--accent-deep),#795322);border:1px solid color-mix(in srgb,var(--accent) 72%,#fff 0%);border-radius:8px;padding:10px 15px;font-weight:700;letter-spacing:.015em;box-shadow:inset 0 1px #ffffff20;transition:filter .15s,transform .15s,box-shadow .15s}
+button:hover{filter:brightness(1.13);transform:translateY(-1px);box-shadow:0 4px 12px #0003,inset 0 1px #ffffff25}
+button:active{transform:translateY(0)}
+button.secondary,.quickbtn,.analysis-tab{background:#202f3d;border-color:#405669;color:#d4e0e9;box-shadow:none}
+button.secondary:hover,.quickbtn:hover,.analysis-tab:hover{background:#2b4051;border-color:var(--accent)}
+button.danger{background:linear-gradient(135deg,#792d32,#4c2028);border-color:#a34d54}
+.actions{gap:9px}
+.quick{gap:8px;margin-top:14px}
+.quickbtn{border-radius:7px;padding:7px 11px;font-size:12px}
+.stats{gap:12px}
+.stat{position:relative;overflow:hidden;background:linear-gradient(145deg,#213140,#182532);border:1px solid #3a5062;border-radius:10px;padding:15px}
+.stat::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
+.stat small{font-size:11px;letter-spacing:.035em}
+.stat strong{display:block;margin-top:4px;font-size:clamp(20px,2.5vw,26px);font-weight:780;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.resultgrid{gap:15px}
+table{font-variant-numeric:tabular-nums}
+th{font-size:11px;letter-spacing:.04em;text-transform:none;background:#1c2a36;color:#b8c8d4}
+th,td{padding:10px 11px;border-bottom:1px solid #2d4050}
+tbody tr:hover{background:#ffffff06}
+.tree-root-title{background:linear-gradient(110deg,#46351f,#29323a);border-color:var(--accent);box-shadow:inset 0 1px #ffffff14}
+.tree-item{background:#1b2a37;border-color:#354a5b;border-radius:9px}
+.tree-item.raw-item{background:#193128;border-color:#39654d}
+.tree-item.final-item{border-color:var(--accent)}
+.tree-qty{color:#f2d19b}
+.admin-badge{background:#1b2a37;border:1px solid #3b5061;color:#c3d0da;border-radius:8px;padding:9px 13px;font-weight:650}
+.admin-badge:hover{background:#263a4a;color:var(--accent)}
+.modal-overlay{background:#05090dcc;backdrop-filter:blur(7px)}
+.modal{background:linear-gradient(145deg,#1a2835,#111b25);border-color:#43596b;border-radius:14px}
+.admin-section{background:#1b2a37;border-color:#35495a}
+.notice{background:#342c1d;border-color:#8b713e;color:#f1d59f}
+.status-banner{border-radius:9px;padding:13px 15px}
+.catalog-tag{background:#1a2936;border-color:#3b5061}
+#supportedItemsTable .item-icon,.item-fallback{border:1px solid #344858;background:#101a24}
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:800px){header{padding:20px 18px}main{padding-left:14px;padding-right:14px}.page-tabs{padding:0 14px}.panel{padding:17px}}
+@media(max-width:480px){header{padding:17px 14px}header p{font-size:12px}main{margin:14px auto;padding:0 10px 44px;gap:12px}.page-tabs{margin-top:11px;padding:0 10px;gap:6px}.page-tab{min-width:0;padding:10px 8px;font-size:12px;flex:1}.panel{padding:14px;border-radius:11px}.controls,.settings-grid,.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.controls label:first-child{grid-column:1/-1}.stat{padding:12px}.stat strong{font-size:20px}table{font-size:12px}th,td{padding:8px 6px}.actions button{flex:1}.modal{padding:17px}}
+
+
+/* Simple, restrained interface */
+:root{--bg:#171b1f;--panel:#20252a;--panel2:#262c32;--line:#3a424a;--text:#e5e7e9;--muted:#aab2b9;--accent:#b87932;--green:#83b58a;--blue:#8caec5;--red:#d88780}
+body{background:#171b1f!important;color:#e5e7e9!important}
+header{background:#20252a!important;box-shadow:none!important}
+main{ }
+.panel,.card,.analysis-view,.result-card{box-shadow:none!important;border-radius:5px!important;background:#20252a!important;border-color:#3a424a!important}
+button,.analysis-tab,.page-tab,.quickbtn,.tab{box-shadow:none!important;border-radius:4px!important;transition:none!important}
+button:hover,.quickbtn:hover{filter:brightness(1.08)}
+input,select,textarea{border-radius:4px!important;box-shadow:none!important}
+*{scrollbar-color:#505961 #20252a}
+
+/* Typography */
+body,button,input,select,textarea{font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;font-feature-settings:"palt"}
+h1,h2,h3,h4,.panel-title,.section-title{font-family:"Avenir Next","Hiragino Sans","Yu Gothic UI",sans-serif;letter-spacing:.015em;font-weight:650}
+input[type="number"],.num,.stat strong,.stat-value,.result-value,.rate,.amount,td.num,th.num{font-family:"DIN Alternate","Bahnschrift","Roboto Mono","SFMono-Regular",Consolas,monospace;font-variant-numeric:tabular-nums lining-nums;letter-spacing:.015em}
+small,.muted,.help,.description,.item-detail{letter-spacing:.01em}
+button{font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>FACTORIO <span class="brand-divider">/</span> PRODUCTION CALCULATOR</h1>
+    <p>Space Age Calculator | Probabilistic Outputs & Planetary Conditions (v7.4)</p>
+  </div>
+  <button id="adminToggleBtn" type="button" class="admin-badge">カスタマイズ設定</button>
+<a class="page-tab" style="margin-left:auto" href="../calculator.html">Japanese Version</a></header>
+<nav class="page-tabs" aria-label="ページ切り替え"><button type="button" class="page-tab active" data-page="calculatorPage">生産計算</button><button type="button" class="page-tab" data-page="catalogPage">アイテム一覧</button><span class="page-tab active" aria-current="page">Space Age版</span><a class="page-tab" href="calculator.html">通常版へ</a></nav>
+<main>
+<div id="calculatorPage" class="page">
+<section class="panel">
+<h2>生産目標</h2>
+<div class="controls">
+<label>作りたいアイテム
+  <input id="itemSearch" placeholder="名前で検索（例：電子基板）" autocomplete="off">
+  <select id="categoryFilter">
+    <option value="all">すべてのカテゴリ</option>
+    <option value="素材">素材・中間素材</option>
+    <option value="電子">電子部品・モジュール</option>
+    <option value="物流">物流・輸送</option>
+    <option value="建築">建築・電力</option>
+    <option value="科学">科学・研究</option>
+    <option value="化学">化学・流体</option>
+    <option value="ロケット">ロケット関連</option>
+    <option value="惑星・Space Age">惑星・Space Age</option>
+  </select>
+  <select id="target" size="1" aria-label="生産するアイテム"></select>
+  <small id="matchCount" class="note">アイテムを選択してください</small>
+</label>
+<label>目標生産量<input id="rate" type="number" min="0.01" step="any" value="60"></label>
+<label>組立機<select id="assembler"><option value="1">組立機1（速度0.5）</option><option value="2">組立機2（速度0.75）</option><option value="3" selected>組立機3（速度1.25）</option></select></label>
+<label>精錬炉<select id="furnace"><option value="stone">石の炉（速度1）</option><option value="steel">鋼鉄の炉（速度2）</option><option value="electric" selected>電気炉（速度2）</option></select></label>
+</div>
+<div class="quick">
+  <span class="note">よく使うアイテム：</span>
+  <button type="button" class="quickbtn" data-item="鉄板">鉄板</button>
+  <button type="button" class="quickbtn" data-item="銅板">銅板</button>
+  <button type="button" class="quickbtn" data-item="鉄の歯車">鉄の歯車</button>
+  <button type="button" class="quickbtn" data-item="電子基板">電子基板</button>
+  <button type="button" class="quickbtn" data-item="発展基板">発展基板</button>
+  <button type="button" class="quickbtn" data-item="自動化サイエンスパック">自動化サイエンス</button>
+</div>
+<div class="actions"><button id="calc" type="button">生産ラインを計算</button><button type="button" class="secondary" id="reset">初期設定に戻す</button></div>
+<div class="admin-section" style="margin-top:14px">
+  <h3>複数アイテムの生産計画</h3>
+  <p class="note">選択中のアイテムと目標数量を計画に追加すると、複数の完成品をまとめて計算できます。数量は個/分で登録します。</p>
+  <div class="actions"><button type="button" class="secondary" id="addPlanTargetBtn">選択中のアイテムを計画に追加</button><button type="button" class="secondary" id="clearPlanBtn">計画をクリア</button></div>
+  <div id="productionPlan"><p class="note">計画はまだありません。未登録の場合は上の単一目標で計算します。</p></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>詳細設定</h2>
+<div class="settings-grid">
+<label>生産力ボーナス (%)<input id="productivityBonus" type="number" min="0" max="1000" step="1" value="0"></label>
+<label>速度ボーナス (%)<input id="speedBonus" type="number" min="-80" max="1000" step="1" value="0"></label>
+<label>設備稼働率 (%)<input id="uptime" type="number" min="1" max="100" step="1" value="100"></label>
+<label>ベルト種類<select id="beltType"><option value="15">黄色（15 個/秒）</option><option value="30">赤色（30 個/秒）</option><option value="45">青色（45 個/秒）</select></label>
+</div>
+<h3 style="margin-top:16px">モジュール・ビーコン設定</h3>
+<div class="settings-grid module-grid">
+<label>モジュール段階<select id="moduleTier"><option value="1">モジュール1</option><option value="2">モジュール2</option><option value="3" selected>モジュール3</option></select></label>
+<label>設備の速度モジュール数<input id="machineSpeedModules" type="number" min="0" max="8" step="1" value="0"></label>
+<label>設備の生産力モジュール数<input id="machineProdModules" type="number" min="0" max="8" step="1" value="0"></label>
+<label>設備の効率モジュール数<input id="machineEfficiencyModules" type="number" min="0" max="8" step="1" value="0"></label>
+<label>ビーコン台数（設備1台あたり）<input id="beaconsPerMachine" type="number" min="0" max="20" step="1" value="0"></label>
+<label>ビーコンのモジュール<select id="beaconModuleType"><option value="speed">速度モジュール</option><option value="efficiency">効率モジュール</option></select></label>
+<label>ビーコン1台あたりの装着数<input id="beaconModuleCount" type="number" min="0" max="2" step="1" value="2"></label>
+</div>
+<p class="note">設備モジュールは各設備に同じ構成で装着する想定です。設備ごとのスロット上限を超える分は自動的に無効化します。鋳造炉・電磁プラント・バイオチャンバーの内蔵生産力+50%を反映します。ビーコンはFactorio 2.0の通常品質（1.5×√台数）の伝達効率で概算します。確率成果物は平均期待値で計算するため、短時間の実際の生産数とは一致しません。副産物は表示しますが、別工程の必要量から自動相殺しません。バイオチャンバーの栄養素燃料も別枠で見積もります。</p>
+</section>
+
+<section class="panel">
+<h2>計算結果</h2>
+<!-- 改善点: アラートバナーとして分かりやすく表示 -->
+<div id="status" class="status-banner info" aria-live="polite">アイテムと目標数量を選んで「生産ラインを計算」を押してください。</div>
+
+<div class="stats">
+<div class="stat"><small>目標生産量</small><strong id="outTarget">—</strong></div>
+<div class="stat"><small>必要設備の合計</small><strong id="outMachines">—</strong></div>
+<div class="stat"><small>素材・流体の種類</small><strong id="outRawKinds">—</strong></div>
+<div class="stat"><small>推定電力（稼働時）</small><strong id="outPower">—</strong></div>
+</div>
+
+<div class="resultgrid">
+  <div>
+    <h3>必要設備一覧</h3>
+    <div id="machines"></div>
+  </div>
+  <div>
+    <h3>必要素材・流体一覧</h3>
+    <div id="raw"></div>
+    <div id="beltSummary" class="notice" style="margin-top:12px">計算後にベルト換算を表示します。</div><div id="powerSummary" class="notice" style="margin-top:8px">計算後に電力概算を表示します。</div><div id="planetSummary" class="notice" style="margin-top:8px">Space Age版では使用惑星・地表条件を表示します。</div>
+    <div class="actions"><button id="exportCsvBtn" type="button" class="secondary">結果をCSV出力</button></div>
+  </div>
+</div>
+</section>
+
+<section class="panel analysis-panel">
+  <h2>分析表示</h2>
+  <nav class="analysis-tabs" aria-label="分析表示の切り替え">
+    <button type="button" class="analysis-tab active" data-analysis="chainPanel" aria-pressed="true">生産チェーン</button>
+    <button type="button" class="analysis-tab" data-analysis="layoutPanel" aria-pressed="false">設備配置の目安</button>
+    <button type="button" class="analysis-tab" data-analysis="bottleneckPanel" aria-pressed="false">素材ボトルネック</button>
+    <button type="button" class="analysis-tab" data-analysis="graphPanel" aria-pressed="false">必要数グラフ</button>
+  </nav>
+  <div id="graphPanel" class="analysis-view hidden"><h3>必要数グラフ</h3><div class="resultgrid"><div><h3>設備の構成</h3><div id="machineChart" class="tree"><p class="note">計算後に表示します。</p></div></div><div><h3>素材の構成（個/分）</h3><div id="rawChart" class="tree"><p class="note">計算後に表示します。</p></div></div></div></div>
+  <div id="chainPanel" class="analysis-view"><h3>生産チェーン</h3><div id="tree" class="tree"><p class="note">計算結果がここに表示されます。</p></div></div>
+  <div id="layoutPanel" class="analysis-view hidden"><h3>設備配置の目安</h3><p class="note">1列あたり最大10台として、設備の列数と配置台数を概算します。実際のベルト・流体配管・通路幅は含みません。</p><div id="layoutSummary" class="table-wrap">計算後に配置案を表示します。</div></div>
+  <div id="bottleneckPanel" class="analysis-view hidden"><h3>素材ボトルネック診断</h3><div id="bottleneckSummary" class="notice">計算後に素材ごとの流量とベルト負荷を表示します。</div></div>
+</section>
+<footer>Factorio ファンメイド計算機 Space Age版 v7.0。確率成果物は期待値で計算し、複数成果物・一部レシピの地表条件を表示します。副産物の需要相殺、鮮度・腐敗、品質、研究アンロック、惑星固有の採掘・環境効果は未対応です。電力・太陽光・蓄電池・配置案は概算です。</footer>
+</div>
+<div id="catalogPage" class="page hidden"><section class="panel" id="supportedItemsPanel">
+  <h2>対応アイテム一覧</h2>
+  <p class="note">現在読み込まれているレシピデータをもとに、完成品として選択できるアイテムと、材料としてのみ使われるアイテムを一覧表示します。レシピが登録されていない素材は完成品の生産計算対象にはなりません。</p>
+  <div class="catalog-toolbar">
+    <input id="supportedItemSearch" type="search" placeholder="アイテム名・材料名で検索" autocomplete="off" aria-label="対応アイテムを検索">
+    <select id="supportedItemCategory" aria-label="カテゴリで絞り込み">
+      <option value="all">すべてのカテゴリ</option>
+      <option value="素材">素材・中間素材</option>
+      <option value="電子">電子部品・モジュール</option>
+      <option value="物流">物流・輸送</option>
+      <option value="建築">建築・電力</option>
+      <option value="科学">科学・研究</option>
+      <option value="化学">化学・流体</option>
+      <option value="ロケット">ロケット関連</option>
+      <option value="惑星・Space Age">惑星・Space Age</option>
+      <option value="raw">材料のみ（レシピなし）</option>
+    </select>
+  </div>
+  <div class="catalog-count" aria-live="polite">
+    <span id="supportedItemCount">読み込み中…</span>
+    <span id="rawMaterialCount"></span>
+  </div>
+  <div class="catalog-wrap">
+    <table id="supportedItemsTable">
+      <thead><tr><th>アイテム</th><th>区分</th><th>生産レシピ・必要材料</th></tr></thead>
+      <tbody id="supportedItemsBody"><tr><td colspan="3" class="note">アイテム一覧を読み込んでいます。</td></tr></tbody>
+    </table>
+  </div>
+</section>
+</div>
+</main>
+
+<!-- カスタマイズモーダル -->
+<div id="adminModal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>🛠️ レシピ・設備設定</h2>
+      <button id="closeAdminBtn" type="button" class="close-btn" title="閉じる">&times;</button>
+    </div>
+
+    <div id="adminContentSection">
+      <div class="admin-section">
+        <h3>アイテム画像の設定</h3>
+        <p class="note">標準ではFactorio Wikiのアイコン画像を自動表示します。アイテムごとに画像URLを指定するか、画像ファイルを登録して上書きできます。</p>
+        <div class="form-group">
+          <label>対象アイテム<select id="imageItemSelect"></select></label>
+          <label>画像URL（空欄なら自動画像）<input id="itemImageUrl" type="url" placeholder="https://example.com/item.png"></label>
+          <label>画像ファイルを登録<input id="itemImageFile" type="file" accept="image/*"></label>
+          <div class="actions">
+            <button type="button" id="saveItemImageBtn">この画像設定を保存</button>
+            <button type="button" class="secondary" id="resetItemImageBtn">自動画像に戻す</button>
+          </div>
+          <p id="itemImageMsg" class="note" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="admin-section">
+        <h3>設備速度カスタマイズ (現在セッション)</h3>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+          <label>組立機1 速度 <input id="speedA1" type="number" step="0.05" value="0.5"></label>
+          <label>組立機2 速度 <input id="speedA2" type="number" step="0.05" value="0.75"></label>
+          <label>組立機3 速度 <input id="speedA3" type="number" step="0.05" value="1.25"></label>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h3>レシピGUI編集</h3>
+        <p class="note">レシピを選択して編集、または新規作成できます。材料欄はJSON形式です（例：{"鉄板":2,"銅線":3}）。</p>
+        <div class="form-group">
+          <label>編集するレシピ<select id="recipeEditSelect"><option value="">新規レシピ</option></select></label>
+          <label>レシピID<input id="editRecipeId" placeholder="custom-recipe"></label>
+          <label>レシピ名<input id="editRecipeName" placeholder="レシピ名"></label>
+          <div class="controls">
+            <label>カテゴリ<select id="editRecipeCat"><option value="craft">組立</option><option value="fluidcraft">流体対応組立</option><option value="smelt">精錬</option><option value="chem">化学</option><option value="advanced">高度な組立</option><option value="rocket">ロケット</option></select></label>
+            <label>製造時間（秒）<input id="editRecipeTime" type="number" min="0.01" step="any" value="1"></label>
+            <label>生産個数<input id="editRecipeOut" type="number" min="0.01" step="any" value="1"></label>
+          </div>
+          <label>必要材料（JSON）<textarea id="editRecipeInputs" rows="3" placeholder='{"鉄板":2}'></textarea></label>
+          <div class="actions"><button type="button" id="saveRecipeEditBtn">レシピを保存</button><button type="button" class="secondary" id="clearRecipeEditBtn">入力をクリア</button><button type="button" class="danger" id="deleteRecipeEditBtn">選択レシピを削除</button></div>
+          <p id="recipeEditMsg" class="note" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h3>レシピマスターデータ管理</h3>
+        <p class="note">Factorio data.raw形式のレシピJSONを取り込めます。単一の確定成果物に対応し、未対応レシピは除外して件数を報告します。</p>
+        <label>現在のデータセット名<input id="datasetLabel" value="同梱データ（Space Age対応）"></label>
+        <div class="actions" style="margin-top:8px"><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">Factorio data.raw JSONを取り込む<input id="importFactorioData" type="file" accept=".json,application/json" style="display:none"></label></div>
+        <p id="factorioImportMsg" class="note" aria-live="polite"></p>
+        <div class="actions" style="margin-bottom: 12px; margin-top:12px;">
+          <button type="button" class="secondary" id="export">JSONエクスポート</button>
+          <label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">
+            JSONインポート <input id="import" type="file" accept=".json,application/json" style="display:none">
+          </label>
+          <button type="button" class="secondary" id="saveStorageBtn">ブラウザに保存</button><button type="button" class="secondary" id="backupAllBtn">全設定バックアップ</button><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">全設定復元<input id="restoreAllInput" type="file" accept=".json,application/json" style="display:none"></label>
+          <button type="button" class="danger" id="resetStorageBtn">デフォルトに戻す</button>
+        </div>
+        <textarea id="recipeJsonEditor" rows="6" style="width:100%; font-family: monospace; font-size: 12px;" placeholder="JSONデータ"></textarea>
+        <div style="margin-top: 8px;"><button type="button" id="applyJsonTextBtn">テキストから直に反映</button></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button id="backToMainBtn" type="button" class="secondary">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const APP_EDITION = 'spaceage';
+  const RECIPE_STORAGE_KEY = `factorio_custom_recipes_${APP_EDITION}`;
+  const RECIPE_VERSION_KEY = `factorio_recipe_data_version_${APP_EDITION}`;
+  const SETTINGS_STORAGE_KEY = `factorio_calculator_settings_${APP_EDITION}`;
+  const PLAN_STORAGE_KEY = `factorio_production_plan_${APP_EDITION}`;
+
+  const DEFAULT_RECIPES = [
+    {id:"iron-plate",name:"鉄板",time:3.2,cat:"smelt",out:1,in:{鉄鉱石:1}},
+    {id:"copper-plate",name:"銅板",time:3.2,cat:"smelt",out:1,in:{銅鉱石:1}},
+    {id:"steel-plate",name:"鋼材",time:16,cat:"smelt",out:1,in:{鉄板:5}},
+    {id:"stone-brick",name:"石レンガ",time:3.2,cat:"smelt",out:1,in:{石:2}},
+    {id:"iron-gear-wheel",name:"鉄の歯車",time:.5,cat:"craft",out:1,in:{鉄板:2}},
+    {id:"iron-stick",name:"鉄の棒",time:.5,cat:"craft",out:2,in:{鉄板:1}},
+    {id:"copper-cable",name:"銅線",time:.5,cat:"craft",out:2,in:{銅板:1}},
+    {id:"pipe",name:"パイプ",time:.5,cat:"craft",out:1,in:{鉄板:1}},
+    {id:"electronic-circuit",name:"電子基板",time:.5,cat:"craft",out:1,in:{鉄板:1,銅線:3}},
+    {id:"advanced-circuit",name:"発展基板",time:6,cat:"craft",out:1,in:{電子基板:2,プラスチック棒:2,銅線:4}},
+    {id:"processing-unit",name:"制御基板",time:10,cat:"fluidcraft",out:1,in:{電子基板:20,発展基板:2,硫酸:5}},
+    {id:"plastic-bar",name:"プラスチック棒",time:1,cat:"chem",out:2,in:{石炭:1,石油ガス:20}},
+    {id:"sulfur",name:"硫黄",time:1,cat:"chem",out:2,in:{水:30,石油ガス:30}},
+    {id:"sulfuric-acid",name:"硫酸",time:1,cat:"chem",out:50,in:{硫黄:5,鉄板:1,水:100}},
+    {id:"battery",name:"電池",time:4,cat:"chem",out:1,in:{硫酸:20,鉄板:1,銅板:1}},
+    {id:"lubricant",name:"潤滑油",time:1,cat:"chem",out:10,in:{重油:10}},
+    {id:"solid-fuel-petroleum",name:"固形燃料（石油ガス）",time:2,cat:"chem",out:1,in:{石油ガス:20}},
+    {id:"solid-fuel-light",name:"固形燃料（軽油）",time:2,cat:"chem",out:1,in:{軽油:10}},
+    {id:"solid-fuel-heavy",name:"固形燃料（重油）",time:2,cat:"chem",out:1,in:{重油:20}},
+    {id:"rocket-fuel",name:"ロケット燃料",time:15,cat:"fluidcraft",out:1,in:{"固形燃料（軽油）":10,軽油:10}},
+    {id:"engine-unit",name:"エンジンユニット",time:10,cat:"advanced",out:1,in:{鋼材:1,鉄の歯車:1,パイプ:2}},
+    {id:"electric-engine-unit",name:"電動エンジンユニット",time:10,cat:"fluidcraft",out:1,in:{エンジンユニット:1,潤滑油:15,電子基板:2}},
+    {id:"flying-robot-frame",name:"飛行ロボットフレーム",time:20,cat:"craft",out:1,in:{電動エンジンユニット:1,電池:2,鋼材:1,電子基板:3}},
+    {id:"low-density-structure",name:"軽量化素材",time:15,cat:"craft",out:1,in:{鋼材:2,銅板:20,プラスチック棒:5}},
+    {id:"transport-belt",name:"搬送ベルト",time:.5,cat:"craft",out:2,in:{鉄の歯車:1,鉄板:1}},
+    {id:"underground-belt",name:"地下ベルト",time:1,cat:"craft",out:2,in:{搬送ベルト:5,鉄板:10,鉄の歯車:5}},
+    {id:"splitter",name:"分配器",time:1,cat:"craft",out:1,in:{搬送ベルト:4,電子基板:5,鉄の歯車:4}},
+    {id:"inserter",name:"インサーター",time:.5,cat:"craft",out:1,in:{電子基板:1,鉄の歯車:1,鉄板:1}},
+    {id:"long-handed-inserter",name:"ロングアームインサーター",time:.5,cat:"craft",out:1,in:{インサーター:1,鉄の棒:1,鉄板:1}},
+    {id:"fast-inserter",name:"高速インサーター",time:.5,cat:"craft",out:1,in:{電子基板:2,鉄板:2,インサーター:1}},
+    {id:"small-electric-pole",name:"小型電柱",time:.5,cat:"craft",out:2,in:{木材:2,銅板:2}},
+    {id:"medium-electric-pole",name:"中型電柱",time:.5,cat:"craft",out:1,in:{鋼材:2,銅板:2}},
+    {id:"big-electric-pole",name:"大型電柱",time:2,cat:"craft",out:1,in:{鋼材:5,銅板:5,鉄の棒:8}},
+    {id:"assembling-machine-1",name:"組立機1",time:.5,cat:"craft",out:1,in:{電子基板:3,鉄の歯車:5,鉄板:9}},
+    {id:"assembling-machine-2",name:"組立機2",time:.5,cat:"craft",out:1,in:{組立機1:1,電子基板:3,鉄の歯車:5,鉄板:9}},
+    {id:"assembling-machine-3",name:"組立機3",time:.5,cat:"craft",out:1,in:{組立機2:2,速度モジュール:4}},
+    {id:"electric-furnace",name:"電気炉",time:5,cat:"craft",out:1,in:{鋼材:10,発展基板:5,石レンガ:10}},
+    {id:"solar-panel",name:"ソーラーパネル",time:10,cat:"craft",out:1,in:{鋼材:5,電子基板:15,銅板:5}},
+    {id:"accumulator",name:"蓄電池",time:10,cat:"craft",out:1,in:{電池:5,鉄板:2}},
+    {id:"radar",name:"レーダー",time:.5,cat:"craft",out:1,in:{電子基板:5,鉄の歯車:5,鉄板:10}},
+    {id:"lab",name:"研究所",time:2,cat:"craft",out:1,in:{電子基板:10,鉄の歯車:10,搬送ベルト:4}},
+    {id:"roboport",name:"ロボットステーション",time:5,cat:"craft",out:1,in:{鋼材:45,鉄の歯車:45,電子基板:45}},
+    {id:"pipe-to-ground",name:"地下パイプ",time:1,cat:"craft",out:2,in:{鉄板:5,パイプ:10}},
+    {id:"rail",name:"レール",time:.5,cat:"craft",out:2,in:{鉄の棒:1,鋼材:1,石レンガ:1}},
+    {id:"concrete",name:"コンクリート",time:10,cat:"craft",out:10,in:{鉄鉱石:1,石:5,水:100}},
+    {id:"stone-wall",name:"石壁",time:.5,cat:"craft",out:1,in:{石レンガ:5}},
+    {id:"wooden-chest",name:"木製チェスト",time:.5,cat:"craft",out:1,in:{木材:2}},
+    {id:"steel-chest",name:"鋼鉄チェスト",time:.5,cat:"craft",out:1,in:{鋼材:8}},
+    {id:"automation-science-pack",name:"自動化サイエンスパック",time:5,cat:"craft",out:1,in:{銅板:1,鉄の歯車:1}},
+    {id:"logistic-science-pack",name:"物流サイエンスパック",time:6,cat:"craft",out:1,in:{インサーター:1,搬送ベルト:1}},
+    {id:"chemical-science-pack",name:"化学サイエンスパック",time:24,cat:"craft",out:2,in:{エンジンユニット:2,発展基板:3,硫黄:1}},
+    {id:"production-science-pack",name:"製造サイエンスパック",time:21,cat:"craft",out:3,in:{電気炉:1,生産力モジュール:1,レール:30}},
+    {id:"utility-science-pack",name:"ユーティリティサイエンスパック",time:21,cat:"craft",out:3,in:{軽量化素材:3,制御基板:2,飛行ロボットフレーム:1}},
+    {id:"speed-module",name:"速度モジュール",time:15,cat:"craft",out:1,in:{発展基板:5,電子基板:5}},
+    {id:"efficiency-module",name:"効率モジュール",time:15,cat:"craft",out:1,in:{発展基板:5,電子基板:5}},
+    {id:"productivity-module",name:"生産力モジュール",time:15,cat:"craft",out:1,in:{発展基板:5,電子基板:5}},
+    {id:"speed-module-2",name:"速度モジュール2",time:30,cat:"craft",out:1,in:{速度モジュール:4,発展基板:5,制御基板:5}},
+    {id:"efficiency-module-2",name:"効率モジュール2",time:30,cat:"craft",out:1,in:{効率モジュール:4,発展基板:5,制御基板:5}},
+    {id:"productivity-module-2",name:"生産力モジュール2",time:30,cat:"craft",out:1,in:{生産力モジュール:4,発展基板:5,制御基板:5}},
+    {id:"speed-module-3",name:"速度モジュール3",time:60,cat:"craft",out:1,in:{速度モジュール2:4,発展基板:5,制御基板:5}},
+    {id:"efficiency-module-3",name:"効率モジュール3",time:60,cat:"craft",out:1,in:{効率モジュール2:4,発展基板:5,制御基板:5}},
+    {id:"productivity-module-3",name:"生産力モジュール3",time:60,cat:"craft",out:1,in:{生産力モジュール2:4,発展基板:5,制御基板:5}},
+    {id:"beacon",name:"ビーコン",time:15,cat:"craft",out:1,in:{電子基板:20,発展基板:20,鋼材:10,銅線:10}},
+    {id:"rocket-part",name:"ロケット部品",time:3,cat:"rocket",out:1,in:{制御基板:10,軽量化素材:10,ロケット燃料:10}},
+    {id:"stone-furnace",name:"石の炉",time:.5,cat:"craft",out:1,in:{石:5}},
+    {id:"steel-furnace",name:"鋼鉄の炉",time:3,cat:"craft",out:1,in:{鋼材:6,石レンガ:10}},
+    {id:"burner-mining-drill",name:"燃料式採掘機",time:2,cat:"craft",out:1,in:{鉄の歯車:3,鉄板:3,石の炉:1}},
+    {id:"electric-mining-drill",name:"電動採掘機",time:2,cat:"craft",out:1,in:{鉄の歯車:10,電子基板:5,鉄板:10}},
+    {id:"pumpjack",name:"油井",time:3,cat:"craft",out:1,in:{鋼材:5,鉄の歯車:10,パイプ:5,電子基板:5}},
+    {id:"oil-refinery",name:"原油精製所",time:8,cat:"craft",out:1,in:{鋼材:10,鉄の歯車:10,石レンガ:10,電子基板:10,パイプ:10}},
+    {id:"chemical-plant",name:"化学プラント",time:5,cat:"craft",out:1,in:{鋼材:5,鉄の歯車:5,パイプ:5,電子基板:5}},
+    {id:"storage-tank",name:"貯蔵タンク",time:3,cat:"craft",out:1,in:{鋼材:20,鉄の歯車:5,パイプ:5}},
+    {id:"pump",name:"ポンプ",time:2,cat:"craft",out:1,in:{エンジンユニット:1,鋼材:1,パイプ:1}},
+    {id:"stack-inserter",name:"スタックインサーター",time:.5,cat:"craft",out:1,in:{高速インサーター:1,電子基板:15,鉄の歯車:15}},
+    {id:"fast-transport-belt",name:"高速搬送ベルト",time:.5,cat:"craft",out:2,in:{搬送ベルト:5,鉄の歯車:5}},
+    {id:"express-transport-belt",name:"超高速搬送ベルト",time:.5,cat:"craft",out:2,in:{高速搬送ベルト:5,鉄の歯車:5,潤滑油:20}},
+    {id:"fast-splitter",name:"高速分配器",time:2,cat:"craft",out:1,in:{分配器:1,鉄の歯車:10,電子基板:10}},
+    {id:"rail-signal",name:"列車用信号",time:.5,cat:"craft",out:1,in:{鉄板:5,電子基板:1,鉄の棒:1}},
+    {id:"rail-chain-signal",name:"連鎖式列車用信号",time:.5,cat:"craft",out:1,in:{鉄板:5,電子基板:1,鉄の棒:1}},
+    {id:"train-stop",name:"駅",time:.5,cat:"craft",out:1,in:{鉄板:5,鉄の棒:6,鋼材:3,電子基板:1}},
+    {id:"locomotive",name:"機関車",time:4,cat:"craft",out:1,in:{エンジンユニット:10,電子基板:20,鋼材:30}},
+    {id:"cargo-wagon",name:"貨物車両",time:1,cat:"craft",out:1,in:{鉄の歯車:10,鉄板:20,鋼材:20}},
+    {id:"fluid-wagon",name:"タンク貨車",time:1,cat:"craft",out:1,in:{鉄の歯車:10,パイプ:16,貯蔵タンク:1,鋼材:10}},
+    {id:"refined-concrete",name:"鉄筋コンクリート",time:15,cat:"craft",out:10,in:{コンクリート:20,鉄の棒:8,鋼材:1,水:100}},
+    {id:"steam-engine",name:"蒸気機関",time:.5,cat:"craft",out:1,in:{鉄の歯車:10,パイプ:5,鉄板:5}},
+    {id:"boiler",name:"ボイラー",time:.5,cat:"craft",out:1,in:{パイプ:4,石の炉:1}},
+    {id:"steam-turbine",name:"蒸気タービン",time:3,cat:"craft",out:1,in:{鉄の歯車:50,銅板:50,パイプ:20}},
+    {id:"logistic-robot",name:"物流ロボット",time:.5,cat:"craft",out:1,in:{飛行ロボットフレーム:1,制御基板:2}},
+    {id:"construction-robot",name:"建設ロボット",time:.5,cat:"craft",out:1,in:{飛行ロボットフレーム:1,電子基板:2}},
+    // Space Age: Gleba / Biochamber
+    {id:"yumako-processing",name:"ユマコマッシュ",time:1,cat:"bio",out:2,in:{ユマコ:1},mainProduct:"ユマコマッシュ",results:[{name:"ユマコマッシュ",amount:2},{name:"ユマコの種",amount:1,probability:0.02}]},
+    {id:"jellynut-processing",name:"ゼリー",time:1,cat:"bio",out:4,in:{ジェリーナッツ:1},mainProduct:"ゼリー",results:[{name:"ゼリー",amount:4},{name:"ジェリーナッツの種",amount:1,probability:0.02}]},
+    {id:"bioflux",name:"バイオフラックス",time:6,cat:"bio",out:4,in:{ユマコマッシュ:15,ゼリー:12}},
+    {id:"nutrients-from-bioflux",name:"栄養素",time:2,cat:"bio",out:40,in:{バイオフラックス:5}},
+    {id:"carbon-fiber",name:"カーボンファイバー",time:5,cat:"bio",out:1,in:{ユマコマッシュ:10,炭素:1}},
+    {id:"agricultural-science-pack",name:"農業サイエンスパック",time:4,cat:"bio",out:1,in:{バイオフラックス:1,ペンタポッドの卵:1}},
+    {id:"biochamber",name:"バイオチャンバー",time:20,cat:"craft",out:1,in:{栄養素:5,ペンタポッドの卵:1,鉄板:20,電子基板:5,埋立地:1}},
+    // Space Age: Vulcanus / Foundry
+    {id:"carbon",name:"炭素",time:1,cat:"chem",out:1,in:{石炭:2,硫酸:20}},
+    {id:"tungsten-carbide",name:"タングステンカーバイド",time:1,cat:"craft",out:1,in:{タングステン鉱石:2,硫酸:10,炭素:1}},
+    {id:"foundry",name:"鋳造炉",time:10,cat:"craft",out:1,in:{タングステンカーバイド:50,鋼材:50,電子基板:30,鉄筋コンクリート:20,潤滑油:20}},
+    {id:"metallurgic-science-pack",name:"冶金サイエンスパック",time:10,cat:"foundry",out:1,in:{タングステンカーバイド:3,タングステン材:2,溶融銅:200}},
+    // Space Age: Fulgora / Electromagnetic plant
+    {id:"holmium-solution",name:"ホルミウム溶液",time:10,cat:"chem",out:100,in:{ホルミウム鉱石:2,石:1,水:10}},
+    {id:"holmium-plate",name:"ホルミウム板",time:1,cat:"craft",out:1,in:{ホルミウム溶液:20}},
+    {id:"electrolyte",name:"電解液",time:5,cat:"electromagnetic",out:10,in:{石:1,重油:10,ホルミウム溶液:10}},
+    {id:"superconductor",name:"超伝導体",time:5,cat:"electromagnetic",out:2,in:{ホルミウム板:1,銅板:1,プラスチック棒:1,軽油:5}},
+    {id:"supercapacitor",name:"スーパーキャパシタ",time:10,cat:"electromagnetic",out:1,in:{ホルミウム板:2,超伝導体:2,電子基板:4,電池:1,電解液:10}},
+    {id:"electromagnetic-plant",name:"電磁プラント",time:10,cat:"craft",out:1,in:{ホルミウム板:150,鋼材:50,制御基板:50,鉄筋コンクリート:50}},
+    {id:"electromagnetic-science-pack",name:"電磁サイエンスパック",time:10,cat:"electromagnetic",out:1,in:{スーパーキャパシタ:1,蓄電池:1,電解液:25,ホルミウム溶液:25}},
+    // Space Age: Aquilo / Cryogenic plant
+    {id:"lithium-plate",name:"リチウム板",time:6.4,cat:"smelt",out:1,in:{リチウム:1}},
+    {id:"cryogenic-plant",name:"低温プラント",time:10,cat:"craft",out:1,in:{鉄筋コンクリート:40,超伝導体:20,制御基板:20,リチウム板:20}},
+    {id:"cryogenic-science-pack",name:"低温サイエンスパック",time:20,cat:"cryo",out:1,in:{氷:3,リチウム板:1,"フルオロケトン（低温）":6},byproducts:{"フルオロケトン（高温）":3}},
+    {id:"quantum-processor",name:"量子プロセッサ",time:30,cat:"electromagnetic",out:1,in:{タングステンカーバイド:1,制御基板:1,超伝導体:1,カーボンファイバー:1,リチウム板:2,"フルオロケトン（低温）":10},byproducts:{"フルオロケトン（高温）":5}},
+    // Space Age: space platform construction
+    {id:"space-science-pack",name:"宇宙サイエンスパック",time:15,cat:"craft",out:5,in:{鉄板:2,炭素:1,氷:1},planet:"宇宙空間",surface:"重力 0"},
+    {id:"space-platform-foundation",name:"宇宙プラットフォーム基礎",time:10,cat:"craft",out:1,in:{鋼材:20,銅線:20}},
+    {id:"space-platform-starter-pack",name:"宇宙プラットフォームスターターパック",time:60,cat:"craft",out:1,in:{宇宙プラットフォーム基礎:60,鋼材:20,制御基板:20}},
+    {id:"cargo-bay",name:"カーゴベイ",time:10,cat:"craft",out:1,in:{鋼材:20,軽量化素材:20,制御基板:5}},
+    {id:"asteroid-collector",name:"アステロイドコレクター",time:10,cat:"craft",out:1,in:{軽量化素材:20,電動エンジンユニット:8,制御基板:5}},
+    {id:"crusher",name:"クラッシャー",time:10,cat:"craft",out:1,in:{軽量化素材:20,鋼材:10,電動エンジンユニット:10}},
+    {id:"thruster",name:"スラスター",time:10,cat:"craft",out:1,in:{鋼材:10,制御基板:10,電動エンジンユニット:5}}
+  ];
+
+  // Space Ageの惑星区分と、ゲーム内レシピで明示される代表的な地表条件。
+  const SPACE_AGE_PLANETS = {
+    "yumako-processing":"グレバ", "jellynut-processing":"グレバ", "bioflux":"グレバ", "nutrients-from-bioflux":"グレバ", "carbon-fiber":"グレバ", "agricultural-science-pack":"グレバ", "biochamber":"グレバ",
+    "carbon":"ヴルカヌス", "tungsten-carbide":"ヴルカヌス", "foundry":"ヴルカヌス", "metallurgic-science-pack":"ヴルカヌス",
+    "holmium-solution":"フルゴラ", "holmium-plate":"フルゴラ", "electrolyte":"フルゴラ", "superconductor":"フルゴラ", "supercapacitor":"フルゴラ", "electromagnetic-plant":"フルゴラ", "electromagnetic-science-pack":"フルゴラ", "quantum-processor":"フルゴラ",
+    "lithium-plate":"アクィロ", "cryogenic-plant":"アクィロ", "cryogenic-science-pack":"アクィロ", "space-science-pack":"宇宙空間",
+    "space-platform-foundation":"宇宙空間", "space-platform-starter-pack":"宇宙空間", "cargo-bay":"宇宙空間", "asteroid-collector":"宇宙空間", "crusher":"宇宙空間", "thruster":"宇宙空間"
+  };
+  const SPACE_AGE_SURFACE = {
+    "agricultural-science-pack":"圧力 2,000", "metallurgic-science-pack":"圧力 4,000", "electromagnetic-science-pack":"磁場 99", "cryogenic-science-pack":"圧力 300", "space-science-pack":"重力 0"
+  };
+  DEFAULT_RECIPES.forEach(r => {
+    if (SPACE_AGE_PLANETS[r.id]) r.planet = SPACE_AGE_PLANETS[r.id];
+    if (SPACE_AGE_SURFACE[r.id]) r.surface = SPACE_AGE_SURFACE[r.id];
+  });
+
+  const RAW_NAMES = new Set(["鉄鉱石","銅鉱石","石炭","石","木材","水","石油ガス","重油","軽油","原油","ウラン鉱石","ウラン235","ウラン238","氷","ユマコ","ジェリーナッツ"]);
+  const FLUID_NAMES = new Set(["水","石油ガス","重油","軽油","硫酸","原油","ホルミウム溶液","溶融銅","溶融鉄","電解液","冷却フルオロケトン","高温フルオロケトン","アンモニア"]);
+
+  let state = {
+    recipes: [],
+    productionPlan: []
+  };
+
+  const $ = id => document.getElementById(id);
+
+  function enforceFixedCalculationSettings() {
+    const fixed = { unit: "min", precision: "0", rounding: "ceil" };
+    Object.entries(fixed).forEach(([id, value]) => {
+      const el = $(id);
+      if (el) el.value = value;
+    });
+  }
+  enforceFixedCalculationSettings();
+
+  const ITEM_IMAGE_STORAGE_KEY = "factorio_item_images_v1";
+  let itemImages = {};
+  try { itemImages = JSON.parse(localStorage.getItem(ITEM_IMAGE_STORAGE_KEY) || "{}") || {}; } catch (_) { itemImages = {}; }
+
+  const RAW_IMAGE_IDS = {
+    "鉄鉱石":"Iron_ore", "銅鉱石":"Copper_ore", "石炭":"Coal", "石":"Stone",
+    "木材":"Wood", "水":"Water", "石油ガス":"Petroleum_gas", "重油":"Heavy_oil",
+    "軽油":"Light_oil", "硫酸":"Sulfuric_acid", "硫黄":"Sulfur",
+    "鉄板":"Iron_plate", "銅板":"Copper_plate", "鋼材":"Steel_plate",
+    "バイオフラックス":"Bioflux", "カーボンファイバー":"Carbon_fiber", "ホルミウム板":"Holmium_plate",
+    "ホルミウム溶液":"Holmium_solution", "タングステンカーバイド":"Tungsten_carbide", "リチウム板":"Lithium_plate"
+  };
+  function automaticItemImage(itemName, recipe) {
+    const id = RAW_IMAGE_IDS[itemName] || (recipe?.id
+      ? recipe.id.replace(/-/g, "_").replace(/^./, c => c.toUpperCase())
+      : "");
+    return id ? `https://wiki.factorio.com/images/${encodeURIComponent(id)}.png` : "";
+  }
+  function itemImageUrl(itemName, recipe) {
+    const custom = itemImages[itemName];
+    return custom || automaticItemImage(itemName, recipe);
+  }
+  function imageMarkup(itemName, recipe) {
+    const src = itemImageUrl(itemName, recipe);
+    const fallback = `<span class="item-fallback" aria-hidden="true">${escapeHtml(itemName.slice(0,2))}</span>`;
+    if (!src) return fallback;
+    return `<img class="item-icon" src="${escapeHtml(src)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'item-fallback',textContent:${JSON.stringify(itemName.slice(0,2))}}))">`;
+  }
+  
+  // 改善点: ストレージ容量超過（QuotaExceededError）を安全にキャッチするハンドリング
+  function saveItemImages() {
+    try { 
+      localStorage.setItem(ITEM_IMAGE_STORAGE_KEY, JSON.stringify(itemImages)); 
+      return true; 
+    }
+    catch (err) { 
+      console.error(err);
+      $("itemImageMsg").textContent = "保存失敗：ストレージの容量制限を超えました。ファイルサイズを小さくするかURLをご利用ください。"; 
+      return false; 
+    }
+  }
+
+  function refreshImageSettings() {
+    const names = [...new Set([...state.recipes.map(r => r.name), ...state.recipes.flatMap(r => Object.keys(r.in || {}))])].sort((a,b)=>a.localeCompare(b,"ja"));
+    const sel = $("imageItemSelect");
+    if (!sel) return;
+    const old = sel.value;
+    sel.innerHTML = names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
+    if (names.includes(old)) sel.value = old;
+    updateImageSettingFields();
+  }
+  function updateImageSettingFields() {
+    const name = $("imageItemSelect").value;
+    $("itemImageUrl").value = itemImages[name] || "";
+    $("itemImageFile").value = "";
+    $("itemImageMsg").textContent = name ? (itemImages[name] ? "カスタム画像を設定中です。" : "自動画像を使用中です。") : "";
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function validateRecipes(data) {
+    if (!Array.isArray(data) || data.length === 0) throw new Error("レシピは1件以上の配列形式にしてください。");
+    const names = new Set(), ids = new Set();
+    data.forEach((r, i) => {
+      if (!r || typeof r !== "object" || Array.isArray(r)) throw new Error(`${i+1}件目：オブジェクトではありません。`);
+      if (typeof r.name !== "string" || !r.name.trim()) throw new Error(`${i+1}件目：名前が空です。`);
+      if (names.has(r.name)) throw new Error(`レシピ名「${r.name}」が重複しています。`);
+      names.add(r.name);
+
+      if (typeof r.id !== "string" || !r.id.trim() || ids.has(r.id)) throw new Error(`${i+1}件目：IDが空、または重複しています (${r.id})。`);
+      ids.add(r.id);
+
+      if (!Number.isFinite(Number(r.time)) || Number(r.time) <= 0) throw new Error(`「${r.name}」：製造時間は正の数値にしてください。`);
+      if (!Number.isFinite(Number(r.out)) || Number(r.out) <= 0) throw new Error(`「${r.name}」：生産量は正の数値にしてください。`);
+      if (!["smelt","craft","fluidcraft","chem","advanced","rocket","foundry","electromagnetic","bio","cryo"].includes(r.cat)) throw new Error(`「${r.name}」：カテゴリが無効です。`);
+
+      if (!r.in || typeof r.in !== "object" || Array.isArray(r.in)) throw new Error(`「${r.name}」：材料データがオブジェクトではありません。`);
+      Object.entries(r.in).forEach(([ing, qty]) => {
+        if (!ing.trim() || !Number.isFinite(Number(qty)) || Number(qty) <= 0) throw new Error(`「${r.name}」の材料「${ing}」の数値が不正です。`);
+      });
+      if (r.byproducts != null) {
+        if (!r.byproducts || typeof r.byproducts !== "object" || Array.isArray(r.byproducts)) throw new Error(`「${r.name}」：副産物データが不正です。`);
+        Object.entries(r.byproducts).forEach(([name, qty]) => {
+          if (!name.trim() || !Number.isFinite(Number(qty)) || Number(qty) <= 0) throw new Error(`「${r.name}」の副産物「${name}」の数値が不正です。`);
+        });
+      }
+      if (r.results != null) {
+        if (!Array.isArray(r.results) || !r.results.length) throw new Error(`「${r.name}」：複数成果物データが不正です。`);
+        r.results.forEach((p, j) => {
+          if (!p || typeof p.name !== "string" || !p.name.trim() || !Number.isFinite(Number(p.amount)) || Number(p.amount) <= 0) throw new Error(`「${r.name}」：成果物 ${j+1} のデータが不正です。`);
+          if (p.probability != null && (!Number.isFinite(Number(p.probability)) || Number(p.probability) < 0 || Number(p.probability) > 1)) throw new Error(`「${r.name}」：成果物「${p.name}」の確率は0〜1にしてください。`);
+        });
+        if (r.mainProduct != null && !r.results.some(p => p.name === r.mainProduct)) throw new Error(`「${r.name}」：主成果物が成果物一覧にありません。`);
+      }
+    });
+    return data;
+  }
+
+  function recipeResults(rec) {
+    return Array.isArray(rec.results) && rec.results.length
+      ? rec.results.map(p => ({ name:p.name, amount:Number(p.amount), probability:p.probability == null ? 1 : Number(p.probability) }))
+      : [{ name:rec.name, amount:Number(rec.out), probability:1 }];
+  }
+  function expectedRecipeOutput(rec, productName) {
+    return recipeResults(rec).filter(p => p.name === productName).reduce((sum,p) => sum + p.amount * p.probability, 0);
+  }
+  function recipeSideProducts(rec) {
+    const main = rec.mainProduct || rec.name;
+    const products = {};
+    recipeResults(rec).forEach(p => { if (p.name !== main) products[p.name] = (products[p.name] || 0) + p.amount * p.probability; });
+    if (!(Array.isArray(rec.results) && rec.results.length)) {
+      Object.entries(rec.byproducts || {}).forEach(([name,amount]) => { products[name] = (products[name] || 0) + Number(amount); });
+    }
+    return products;
+  }
+
+  function loadRecipes() {
+    try {
+      const stored = localStorage.getItem(RECIPE_STORAGE_KEY);
+      if (stored) {
+        const savedRecipes = validateRecipes(JSON.parse(stored));
+        const savedDataVersion = localStorage.getItem(RECIPE_VERSION_KEY);
+        if (savedDataVersion !== "7.0") {
+          // Bring older saved catalogs forward without overwriting customized recipes.
+          const ids = new Set(savedRecipes.map(r => r.id));
+          const names = new Set(savedRecipes.map(r => r.name));
+          const additions = DEFAULT_RECIPES.filter(r => !ids.has(r.id) && !names.has(r.name));
+          state.recipes = validateRecipes([...savedRecipes, ...additions]);
+          try {
+            localStorage.setItem(RECIPE_STORAGE_KEY, JSON.stringify(state.recipes));
+            localStorage.setItem(RECIPE_VERSION_KEY, "7.0");
+          } catch (_) {}
+        } else {
+          state.recipes = savedRecipes;
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn("保存レシピのロード失敗。デフォルト初期化します。", err);
+    }
+    state.recipes = JSON.parse(JSON.stringify(DEFAULT_RECIPES));
+    try { localStorage.setItem(RECIPE_VERSION_KEY, "7.0"); } catch (_) {}
+  }
+
+  function fmt(n) {
+    const value = Number(n);
+    if (!Number.isFinite(value)) return "—";
+    return Number(value.toFixed(0)).toLocaleString("ja-JP", { maximumFractionDigits: 0 });
+  }
+  function fmtExpected(n) {
+    const value = Number(n);
+    if (!Number.isFinite(value)) return "—";
+    return Number(value.toFixed(3)).toLocaleString("ja-JP", { maximumFractionDigits: 3 });
+  }
+
+  // 電力は小規模な値が0に丸められないよう、1MW未満をkWで表示する。
+  function formatPower(kw) {
+    const value = Number(kw);
+    if (!Number.isFinite(value)) return "—";
+    if (Math.abs(value) < 1000) {
+      return `${Number(value.toFixed(1)).toLocaleString("ja-JP", { maximumFractionDigits: 1 })} kW`;
+    }
+    return `${Number((value / 1000).toFixed(2)).toLocaleString("ja-JP", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MW`;
+  }
+
+  function getUnitText() {
+    return "個 / 分";
+  }
+
+  function getRateInMin() {
+    return Number($("rate").value);
+  }
+
+  function displayRate(ratePerMin) {
+    return ratePerMin;
+  }
+
+  function selectedSpeed(cat) {
+    if (cat === "foundry") return 4;
+    if (["electromagnetic","bio","cryo"].includes(cat)) return 2;
+    if (cat === "craft" || cat === "fluidcraft" || cat === "advanced") {
+      const a1 = Number($("speedA1")?.value) || 0.5;
+      const a2 = Number($("speedA2")?.value) || 0.75;
+      const a3 = Number($("speedA3")?.value) || 1.25;
+      return $("assembler").value === "1" ? a1 : $("assembler").value === "2" ? a2 : a3;
+    }
+    if (cat === "smelt") return $("furnace").value === "stone" ? 1 : 2;
+    return 1;
+  }
+
+  function machineInfo(cat) {
+    if (cat === "smelt") {
+      const f = $("furnace").value;
+      return { name: f === "stone" ? "石の炉" : f === "steel" ? "鋼鉄の炉" : "電気炉", kw: f === "electric" ? 180 : 90, electric: f === "electric" };
+    }
+    if (cat === "chem") return { name: "化学プラント", kw: 210, electric: true };
+    if (cat === "rocket") return { name: "ロケットサイロ", kw: 4000, electric: true };
+    if (cat === "foundry") return { name: "鋳造炉", kw: 2500, electric: true };
+    if (cat === "electromagnetic") return { name: "電磁プラント", kw: 2000, electric: true };
+    if (cat === "bio") return { name: "バイオチャンバー", kw: 500, electric: false };
+    if (cat === "cryo") return { name: "低温プラント", kw: 1500, electric: true };
+    const a = $("assembler").value;
+    return { name: "組立機" + a, kw: a === "1" ? 75 : a === "2" ? 150 : 375, electric: true };
+  }
+
+  function machineBaseProductivity(cat) {
+    return ["foundry","electromagnetic","bio"].includes(cat) ? 0.5 : 0;
+  }
+
+  function isIntermediate(recipeName) {
+    return state.recipes.some(r => Object.prototype.hasOwnProperty.call(r.in || {}, recipeName));
+  }
+
+  function canApplyProductivity(recipe) {
+    if (!recipe || recipe.allowProductivity === false) return false;
+    const eligibleProduct = isIntermediate(recipe.name) || recipe.cat === "rocket" || /サイエンスパック/.test(recipe.name);
+    if (!eligibleProduct) return false;
+    if (recipe.cat === "smelt") return $("furnace").value === "electric";
+    if (["craft", "fluidcraft", "advanced"].includes(recipe.cat)) return $("assembler").value !== "1";
+    return ["chem", "rocket", "foundry", "electromagnetic", "bio", "cryo"].includes(recipe.cat);
+  }
+
+  function moduleEffectsFor(recipe) {
+    const tier = Math.min(3, Math.max(1, Number($("moduleTier")?.value) || 3));
+    const tierData = {
+      1: {speed:.20, prod:.04, prodSpeed:.05, speedPower:.50, prodPower:.40, efficiency:.30},
+      2: {speed:.30, prod:.06, prodSpeed:.10, speedPower:.60, prodPower:.60, efficiency:.40},
+      3: {speed:.50, prod:.10, prodSpeed:.15, speedPower:.70, prodPower:.80, efficiency:.50}
+    }[tier];
+    let slots = 0;
+    if (recipe.cat === "smelt") slots = $("furnace").value === "electric" ? 2 : 0;
+    else if (recipe.cat === "chem") slots = 3;
+    else if (recipe.cat === "rocket") slots = 4;
+    else if (recipe.cat === "foundry" || recipe.cat === "bio") slots = 4;
+    else if (recipe.cat === "electromagnetic") slots = 5;
+    else if (recipe.cat === "cryo") slots = 8;
+    else slots = $("assembler").value === "1" ? 0 : $("assembler").value === "2" ? 2 : 4;
+    let speedCount = Math.max(0, Number($("machineSpeedModules")?.value) || 0);
+    let prodCount = canApplyProductivity(recipe) ? Math.max(0, Number($("machineProdModules")?.value) || 0) : 0;
+    let efficiencyCount = Math.max(0, Number($("machineEfficiencyModules")?.value) || 0);
+    const requested = speedCount + prodCount + efficiencyCount;
+    speedCount = Math.min(speedCount, slots);
+    prodCount = Math.min(prodCount, Math.max(0, slots - speedCount));
+    efficiencyCount = Math.min(efficiencyCount, Math.max(0, slots - speedCount - prodCount));
+    const requestedBeacons = Math.max(0, Number($("beaconsPerMachine")?.value) || 0);
+    const maxBeacons = 12;
+    const beaconCount = slots > 0 ? Math.min(requestedBeacons, maxBeacons) : 0;
+    const beaconSlots = Math.min(2, Math.max(0, Number($("beaconModuleCount")?.value) || 0));
+    // Factorio 2.0 normal beacons: total transmission strength = 1.5 × sqrt(beacons affecting one machine).
+    const beaconEffect = beaconCount > 0 ? beaconSlots * 1.5 * Math.sqrt(beaconCount) : 0;
+    const beaconType = $("beaconModuleType")?.value || "speed";
+    const moduleSpeed = speedCount * tierData.speed - prodCount * tierData.prodSpeed + (beaconType === "speed" ? beaconEffect * tierData.speed : 0);
+    const moduleProd = prodCount * tierData.prod;
+    const energyFactor = Math.max(.2, 1 + speedCount * tierData.speedPower + prodCount * tierData.prodPower - efficiencyCount * tierData.efficiency - (beaconType === "efficiency" ? beaconEffect * tierData.efficiency : 0));
+    return {speed:moduleSpeed, productivity:moduleProd, energyFactor, beaconKw:beaconCount * 480, slots, installed:speedCount+prodCount+efficiencyCount, requested, requestedBeacons, beaconCount};
+  }
+
+  function itemCategory(r) {
+    const n = r.name;
+    // Space Age専用アイテムのみを惑星カテゴリへ。通常サイエンスパックは「科学」に分類する。
+    if (["foundry","electromagnetic","bio","cryo"].includes(r.cat) || /農業サイエンスパック|冶金サイエンスパック|電磁サイエンスパック|低温サイエンスパック|バイオ|ホルミウム|タングステン|リチウム板|宇宙プラットフォーム|カーゴベイ|アステロイド|クラッシャー|スラスター|超伝導|キャパシタ|電解液|鋳造炉|電磁プラント|低温プラント/.test(n)) return "惑星・Space Age";
+    if (["smelt","advanced"].includes(r.cat) || ["鉄の歯車","鉄の棒","銅線","パイプ","石レンガ"].includes(n)) return "素材";
+    if (/基板|モジュール|電子/.test(n)) return "電子";
+    if (/ベルト|インサーター|分配器|レール|地下パイプ|チェスト|貨物|機関車|自動車/.test(n)) return "物流";
+    if (/電柱|電気炉|ソーラー|蓄電池|レーダー|研究所|ロボットステーション|ビーコン|組立機/.test(n)) return "建築";
+    if (/サイエンス|科学/.test(n)) return "科学";
+    if (["chem","fluidcraft"].includes(r.cat) || /硫黄|硫酸|プラスチック|電池|燃料|潤滑油/.test(n)) return "化学";
+    if (/ロケット/.test(n)) return "ロケット";
+    return "素材";
+  }
+
+  function renderSupportedItems() {
+    const query = $("supportedItemSearch").value.trim().toLocaleLowerCase("ja");
+    const category = $("supportedItemCategory").value;
+    const outputNames = new Set(state.recipes.map(r => r.name));
+    const materialNames = new Set();
+    state.recipes.forEach(r => Object.keys(r.in || {}).forEach(name => {
+      if (!outputNames.has(name)) materialNames.add(name);
+    }));
+
+    const producible = state.recipes.map(r => ({
+      name: r.name, category: itemCategory(r), recipe: r,
+      kind: "recipe"
+    }));
+    const rawOnly = [...materialNames].sort((a,b) => a.localeCompare(b, "ja")).map(name => ({
+      name, category: "raw", recipe: null, kind: "raw"
+    }));
+    const all = [...producible, ...rawOnly];
+    const filtered = all.filter(item => {
+      const materialText = item.recipe ? Object.keys(item.recipe.in || {}).join(" ") : "";
+      const matchesText = !query ||
+        item.name.toLocaleLowerCase("ja").includes(query) ||
+        materialText.toLocaleLowerCase("ja").includes(query) ||
+        (item.recipe?.id || "").toLocaleLowerCase("ja").includes(query);
+      const matchesCategory = category === "all" ||
+        (category === "raw" ? item.kind === "raw" : item.category === category);
+      return matchesText && matchesCategory;
+    });
+
+    $("supportedItemCount").textContent = `表示 ${filtered.length}件 / 登録レシピ ${producible.length}件`;
+    $("rawMaterialCount").textContent = `材料のみ ${rawOnly.length}種類`;
+
+    if (!filtered.length) {
+      $("supportedItemsBody").innerHTML = '<tr><td colspan="3" class="note">該当するアイテムはありません。検索語やカテゴリを変更してください。</td></tr>';
+      return;
+    }
+
+    $("supportedItemsBody").innerHTML = filtered.map(item => {
+      if (item.kind === "raw") {
+        return `<tr>
+          <td><div class="catalog-item-cell">${imageMarkup(item.name, null)}<span class="item-name">${escapeHtml(item.name)}</span></div></td>
+          <td><span class="catalog-tag">材料のみ</span></td>
+          <td class="item-detail">このデータセットには生産レシピが登録されていません。原材料として集計されます。</td>
+        </tr>`;
+      }
+      const r = item.recipe;
+      const ingredients = Object.entries(r.in || {})
+        .map(([name, amount]) => `${escapeHtml(name)} × ${escapeHtml(amount)}`)
+        .join("、");
+      const sideProducts = Object.entries(recipeSideProducts(r)).map(([name, amount]) => `${escapeHtml(name)} × ${escapeHtml(amount)}（期待値）`).join("、");
+      const outputDetails = recipeResults(r).map(p => `${escapeHtml(p.name)} × ${fmtExpected(p.amount * p.probability)}${p.probability < 1 ? `（${fmtExpected(p.probability*100)}%）` : ""}`).join("、");
+      return `<tr>
+        <td><div class="catalog-item-cell">${imageMarkup(item.name, r)}<span class="item-name">${escapeHtml(item.name)}</span></div></td>
+        <td><span class="catalog-tag">${escapeHtml(item.category)}</span><div class="item-detail">${escapeHtml(r.cat)} / ${escapeHtml(r.time)}秒</div></td>
+        <td class="item-detail">成果物（期待値）：${outputDetails}<br>必要材料：${ingredients || "なし"}${sideProducts ? `<br>副産物・確率成果物：${sideProducts}` : ""}${r.planet ? `<br>主な生産惑星：${escapeHtml(r.planet)}` : ""}${r.surface ? `<br>地表条件：${escapeHtml(r.surface)}` : ""}
+          <div style="margin-top:6px"><button type="button" class="secondary catalog-select-btn" data-item="${escapeHtml(item.name)}" style="padding:4px 8px;font-size:11px">生産目標に選択</button></div>
+        </td>
+      </tr>`;
+    }).join("");
+
+    $("supportedItemsBody").querySelectorAll(".catalog-select-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        $("categoryFilter").value = "all";
+        $("itemSearch").value = "";
+        populate();
+        $("target").value = button.dataset.item;
+        document.querySelectorAll(".quickbtn").forEach(b =>
+          b.classList.toggle("active", b.dataset.item === button.dataset.item));
+        showPage("calculatorPage");
+        $("target").focus();
+      });
+    });
+  }
+
+  function populate() {
+    const q = $("itemSearch").value.trim().toLowerCase();
+    const cat = $("categoryFilter").value;
+    const old = $("target").value;
+    const planet = $("planetFilter")?.value || "all";
+
+    const filtered = state.recipes.filter(r => 
+      (!q || [r.name, r.id, ...Object.keys(r.in || {}), itemCategory(r), r.planet || ""].join(" ").toLowerCase().includes(q)) &&
+      (cat === "all" || itemCategory(r) === cat) &&
+      (planet === "all" || !r.planet || r.planet === planet)
+    );
+
+    const groups = ["素材","電子","物流","建築","科学","化学","ロケット","惑星・Space Age"];
+    $("target").innerHTML = groups.map(g => {
+      const items = filtered.filter(r => itemCategory(r) === g);
+      return items.length ? `<optgroup label="${g}">${items.map(r => `<option value="${escapeHtml(r.name)}">${escapeHtml(r.name)}</option>`).join("")}</optgroup>` : "";
+    }).join("");
+
+    if (filtered.some(r => r.name === old)) $("target").value = old;
+    else if (filtered.length) $("target").value = filtered[0].name;
+
+    $("matchCount").textContent = `${filtered.length}件表示中 / 全${state.recipes.filter(r => APP_EDITION !== "base" || !isSpaceAgeRecipe(r)).length}件`;
+    document.querySelectorAll(".quickbtn").forEach(b => b.classList.toggle("active", b.dataset.item === $("target").value));
+    if ($("recipeJsonEditor")) $("recipeJsonEditor").value = JSON.stringify(state.recipes, null, 2);
+    renderSupportedItems();
+    refreshImageSettings();
+  }
+
+  function renderProductionPlan() {
+    try { localStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(state.productionPlan)); } catch (_) {}
+    const el = $("productionPlan");
+    if (!state.productionPlan.length) {
+      el.innerHTML = '<p class="note">計画はまだありません。未登録の場合は上の単一目標で計算します。</p>';
+      return;
+    }
+    el.innerHTML = '<table class="plan-table"><thead><tr><th>完成品</th><th class="num">目標（個/分）</th><th></th></tr></thead><tbody>' +
+      state.productionPlan.map((x, i) => `<tr><td>${escapeHtml(x.name)}</td><td class="num"><input type="number" min="0.01" step="any" value="${x.rate}" data-plan-rate="${i}" aria-label="${escapeHtml(x.name)}の目標個数"></td><td><button type="button" class="danger" data-plan-remove="${i}">削除</button></td></tr>`).join('') +
+      '</tbody></table>';
+
+    el.querySelectorAll('[data-plan-rate]').forEach(inp => inp.addEventListener('change', () => {
+      const i = Number(inp.dataset.planRate);
+      const v = Number(inp.value);
+      if (Number.isFinite(v) && v > 0) {
+        state.productionPlan[i].rate = v;
+        calc();
+      } else {
+        alert('目標数量は正の数にしてください。');
+        renderProductionPlan();
+      }
+    }));
+
+    el.querySelectorAll('[data-plan-remove]').forEach(btn => btn.addEventListener('click', () => {
+      state.productionPlan.splice(Number(btn.dataset.planRemove), 1);
+      renderProductionPlan();
+      calc();
+    }));
+  }
+
+  // 改善点: アラートバナーの色や内容を動的に更新するヘルパー
+  function setStatusMessage(msg, type = "info") {
+    const statusEl = $("status");
+    statusEl.className = `status-banner ${type}`;
+    statusEl.textContent = msg;
+  }
+
+  function clearCalculationOutput() {
+    window.lastCalculation = null;
+    ["outTarget", "outMachines", "outRawKinds", "outPower"].forEach(id => $(id).textContent = "—");
+    $("machines").innerHTML = "";
+    $("raw").innerHTML = "";
+    $("machineChart").innerHTML = '<p class="note">有効な条件で再計算してください。</p>';
+    $("rawChart").innerHTML = '<p class="note">有効な条件で再計算してください。</p>';
+    $("tree").innerHTML = '<p class="note">有効な条件で再計算してください。</p>';
+    $("beltSummary").textContent = "計算結果はありません。";
+    $("powerSummary").textContent = "計算結果はありません。";
+    if ($("planetSummary")) $("planetSummary").textContent = "計算結果はありません。";
+    if ($("bottleneckSummary")) $("bottleneckSummary").textContent = "計算結果はありません。";
+    if ($("layoutSummary")) $("layoutSummary").textContent = "計算結果はありません。";
+  }
+
+  function calc() {
+    const selectedTarget = state.recipes.find(x => x.name === $("target").value);
+    const singleRate = getRateInMin();
+    const unitTxt = getUnitText();
+    const targets = state.productionPlan.length ? state.productionPlan.map(x => ({ name: x.name, rate: Number(x.rate) })) : (selectedTarget ? [{ name: selectedTarget.name, rate: singleRate }] : []);
+    const totalRate = targets.reduce((sum, x) => sum + x.rate, 0);
+
+    const researchProd = Number($("productivityBonus").value) / 100;
+    const researchSpeed = Number($("speedBonus").value) / 100;
+    const uptime = Number($("uptime").value) / 100;
+    const machineSpeeds = ["speedA1", "speedA2", "speedA3"].map(id => Number($(id).value));
+
+    if (!targets.length || targets.some(x => !state.recipes.some(r => r.name === x.name) || !Number.isFinite(x.rate) || x.rate < 0.01)) {
+      clearCalculationOutput();
+      setStatusMessage("アイテムと0.01以上の生産量を入力してください。", "error");
+      return;
+    }
+    const moduleInputs = ["machineSpeedModules","machineProdModules","machineEfficiencyModules","beaconsPerMachine","beaconModuleCount"].map(id => Number($(id).value));
+    if (![researchProd, researchSpeed, uptime, ...machineSpeeds, ...moduleInputs].every(Number.isFinite) || researchProd < 0 || researchProd > 10 || researchSpeed < -0.8 || researchSpeed > 10 || uptime < 0.01 || uptime > 1 || machineSpeeds.some(v => v <= 0) || moduleInputs.some(v => v < 0 || v > 20 || !Number.isInteger(v)) || moduleInputs.slice(0,3).some(v => v > 8) || moduleInputs[4] > 2) {
+      clearCalculationOutput();
+      setStatusMessage("詳細設定を確認してください。ボーナスは-80〜1000%、稼働率は1〜100%、設備速度は正の数にしてください。", "error");
+      return;
+    }
+
+    const totals = { machines: {}, raw: {}, byproducts: {}, errors: [], notes: [], powerKw: 0, fuelKw: 0, fluidRaw: {}, beaconKw: 0, planets: {}, surfaceConditions: [] };
+
+    function expand(name, needPerMin, path = [], depth = 0) {
+      if (depth > 60) {
+        totals.errors.push("依存関係が深すぎます: " + name);
+        return;
+      }
+      const rec = state.recipes.find(x => x.name === name);
+      if (!rec || RAW_NAMES.has(name)) {
+        totals.raw[name] = (totals.raw[name] || 0) + needPerMin;
+        if (FLUID_NAMES.has(name)) totals.fluidRaw[name] = (totals.fluidRaw[name] || 0) + needPerMin;
+        return;
+      }
+      if (rec.cat === "fluidcraft" && $("assembler").value === "1") {
+        totals.errors.push(name + " は組立機1（流体非対応）では製造できません。");
+        return;
+      }
+      if (path.includes(name)) {
+        totals.errors.push("循環レシピを検出: " + name);
+        return;
+      }
+
+      const moduleFx = moduleEffectsFor(rec);
+      if (moduleFx.requested > moduleFx.slots) totals.notes.push(rec.name + "：設備スロット数に合わせてモジュール数を調整しました。");
+      if (moduleFx.requestedBeacons > moduleFx.beaconCount) totals.notes.push(rec.name + "：ビーコン台数は設備サイズに応じた上限で概算しました。");
+      const effectiveProd = machineBaseProductivity(rec.cat) + (canApplyProductivity(rec) ? researchProd + moduleFx.productivity : 0);
+      const prodFactor = 1 + effectiveProd;
+      const speedFactor = 1 + researchSpeed + moduleFx.speed;
+
+      if (prodFactor <= 0 || speedFactor <= 0) {
+        totals.errors.push(name + " の速度または生産力補正が不正です。");
+        return;
+      }
+
+      const mainProduct = rec.mainProduct || rec.name;
+      const expectedMainOutput = expectedRecipeOutput(rec, mainProduct);
+      if (!(expectedMainOutput > 0)) {
+        totals.errors.push(name + " の主成果物データが不正です。");
+        return;
+      }
+      const crafts = needPerMin / (expectedMainOutput * prodFactor);
+      Object.entries(recipeSideProducts(rec)).forEach(([product, amount]) => {
+        totals.byproducts[product] = (totals.byproducts[product] || 0) + crafts * amount;
+      });
+      const machineRate = 60 * selectedSpeed(rec.cat) * speedFactor / rec.time * uptime;
+
+      if (!Number.isFinite(machineRate) || machineRate <= 0) {
+        totals.errors.push(name + " の設備速度が不正です。");
+        return;
+      }
+
+      const count = crafts / machineRate;
+      if (rec.cat === "bio") {
+        // Biochamber: 500 kW; nutrients provide 2 MJ/item => 0.25 item/s = 15/min per machine.
+        totals.raw["栄養素（設備燃料）"] = (totals.raw["栄養素（設備燃料）"] || 0) + count * 15 * moduleFx.energyFactor;
+      }
+      if (rec.planet) totals.planets[rec.planet] = true;
+      if (rec.surface) totals.surfaceConditions.push(`${rec.name}：${rec.surface}`);
+      const info = machineInfo(rec.cat);
+      const key = `${info.name}｜${name}`;
+      if (!totals.machines[key]) totals.machines[key] = {
+        machineName: info.name, recipeName: name, exact: 0, rounded: 0,
+        powerKw: 0, fuelKw: 0
+      };
+      const row = totals.machines[key];
+      row.exact += count;
+      row.rounded = Math.ceil(row.exact - 1e-9);
+      const activePower = count * (info.kw * moduleFx.energyFactor + moduleFx.beaconKw);
+      row.powerKw += info.electric ? activePower : 0;
+      row.fuelKw += info.electric ? 0 : activePower;
+
+      Object.entries(rec.in || {}).forEach(([ingredient, amount]) => {
+        expand(ingredient, crafts * amount, [...path, name], depth + 1);
+      });
+    }
+
+    targets.forEach(t => expand(t.name, t.rate));
+
+    Object.values(totals.machines).forEach(v => {
+      totals.powerKw += v.powerKw;
+      totals.fuelKw += v.fuelKw;
+    });
+    const machineGroups = {};
+    Object.values(totals.machines).forEach(v => {
+      const g = machineGroups[v.machineName] ||= { exact: 0, rounded: 0, powerKw: 0 };
+      g.exact += v.exact; g.rounded += v.rounded; g.powerKw += v.powerKw;
+    });
+
+    const machineRows = Object.values(totals.machines).map(v =>
+      `<tr><td>${escapeHtml(v.machineName)}<div class="note">${escapeHtml(v.recipeName)}</div></td><td class="num">${fmt(v.exact)}</td><td class="num">${v.rounded}</td><td class="num">${formatPower(v.powerKw)}</td></tr>`
+    ).join("");
+
+    const rawRows = Object.entries(totals.raw).sort((a, b) => a[0].localeCompare(b[0], "ja")).map(([k, v]) => 
+      `<tr><td>${escapeHtml(k)}</td><td class="num">${fmt(displayRate(v))} ${escapeHtml(unitTxt)}</td><td class="num">${fmt(v/60)} /秒</td></tr>`
+    ).join("");
+
+    const machineSum = Object.values(machineGroups).reduce((a, b) => a + b.rounded, 0);
+
+    $("outTarget").textContent = targets.length === 1 ? `${fmt(displayRate(totalRate))} ${unitTxt}` : `${targets.length} 種類 / 合計 ${fmt(displayRate(totalRate))} ${unitTxt}`;
+    $("outMachines").textContent = `${fmt(machineSum)} 台`;
+    $("outRawKinds").textContent = `${Object.keys(totals.raw).length} 種`;
+    $("outPower").textContent = formatPower(totals.powerKw);
+
+    $("machines").innerHTML = machineRows ? `<table><thead><tr><th>設備</th><th class="num">理論台数</th><th class="num">切り上げ</th><th class="num">電力概算</th></tr></thead><tbody>${machineRows}</tbody></table>` : '<p class="note">該当する設備がありません。</p>';
+    const byproductRows = Object.entries(totals.byproducts).sort((a,b)=>a[0].localeCompare(b[0],"ja")).map(([name, amount]) => `<tr><td>${escapeHtml(name)}</td><td class="num">${fmtExpected(amount)} ${escapeHtml(unitTxt)}</td><td class="num">${fmtExpected(amount/60)} /秒</td></tr>`).join("");
+    const byproductTable = byproductRows ? `<h4 style="margin:14px 0 6px">副産物・余剰出力（相殺前）</h4><table><thead><tr><th>副産物</th><th class="num">発生量 (${escapeHtml(unitTxt)})</th><th class="num">発生量/秒</th></tr></thead><tbody>${byproductRows}</tbody></table>` : "";
+    $("raw").innerHTML = (rawRows ? `<table><thead><tr><th>素材・流体</th><th class="num">必要量 (${escapeHtml(unitTxt)})</th><th class="num">必要量/秒</th></tr></thead><tbody>${rawRows}</tbody></table>` : '<p class="note">素材データがありません。</p>') + byproductTable;
+
+    const beltRate = Number($("beltType").value);
+    const solids = Object.entries(totals.raw).filter(([n]) => !FLUID_NAMES.has(n));
+    const solidRate = solids.reduce((sum, [, v]) => sum + v / 60, 0);
+    const beltCount = solidRate / beltRate;
+
+    $("beltSummary").innerHTML = `固体素材の合計流量：<b>${fmt(solidRate)} 個/秒</b><br>選択ベルト換算：<b>${fmt(beltCount)} 本分</b>（理論値・異なる素材を混載できると仮定）`;
+    const solarPanels = Math.ceil(totals.powerKw / 42);
+    const accumulators = Math.ceil(solarPanels * .84);
+    $("powerSummary").innerHTML = `電気設備・ビーコンの稼働時推定：<b>${formatPower(totals.powerKw)}</b><br>燃料式設備の熱入力目安：<b>${formatPower(totals.fuelKw)}</b><br>太陽光発電の目安：<b>${fmt(solarPanels)} 枚</b>／蓄電池：<b>${fmt(accumulators)} 個</b>（ナウヴィス・通常品質の平均出力42kW/枚・昼夜比による概算）`;
+    if ($("planetSummary")) {
+      const planets = Object.keys(totals.planets);
+      const conditions = [...new Set(totals.surfaceConditions)];
+      $("planetSummary").innerHTML = planets.length
+        ? `必要な生産惑星：<b>${planets.map(escapeHtml).join("、")}</b>${conditions.length ? `<br>レシピ地表条件：${conditions.map(escapeHtml).join(" / ")}` : ""}<br><span class="note">惑星間輸送・鮮度・腐敗・現地資源の採掘効率は別途考慮が必要です。</span>`
+        : "この計算チェーンにはSpace Age専用惑星レシピは含まれていません。";
+    }
+
+    const rawEntries = Object.entries(totals.raw).filter(([name]) => !FLUID_NAMES.has(name)).sort((a,b) => b[1]-a[1]);
+    const diagnosticMax = Math.max(1, ...rawEntries.map(([,v]) => v / 60));
+    const diagnosticRows = rawEntries.slice(0,12).map(([name, rate]) => {
+      const perSecond = rate / 60;
+      const belts = Math.ceil(perSecond / beltRate);
+      const overloaded = perSecond > beltRate;
+      return `<div class="diagnostic-row"><span>${escapeHtml(name)}</span><div class="diagnostic-track"><div class="diagnostic-fill ${overloaded ? 'warn' : ''}" style="width:${Math.max(2,Math.min(100,perSecond/diagnosticMax*100))}%"></div></div><b>${fmt(perSecond)} 個/秒 · ${belts}本</b></div>`;
+    }).join("");
+    const overloadedCount = rawEntries.filter(([,v]) => v/60 > beltRate).length;
+    $("bottleneckSummary").innerHTML = rawEntries.length ? `<p>${overloadedCount ? `<b class="error">${overloadedCount}種類の素材が選択ベルト1本の容量を超えています。</b>` : `<b>単一素材でベルト容量を超えるものはありません。</b>`} 上位12素材を表示します。</p><div class="diagnostic-list">${diagnosticRows}</div>` : '<p class="note">素材データがありません。</p>';
+    const layoutRows = Object.values(totals.machines).sort((a,b)=>b.rounded-a.rounded).map(v => {
+      const rows = Math.ceil(v.rounded / 10);
+      const lastRow = v.rounded % 10 || (v.rounded ? 10 : 0);
+      return `<tr><td>${escapeHtml(v.recipeName)}<div class="note">${escapeHtml(v.machineName)}</div></td><td class="num">${v.rounded} 台</td><td class="num">${rows} 列</td><td class="num">${lastRow} 台</td></tr>`;
+    }).join("");
+    $("layoutSummary").innerHTML = layoutRows ? `<table class="layout-table"><thead><tr><th>生産工程</th><th class="num">必要台数</th><th class="num">配置列数</th><th class="num">最終列</th></tr></thead><tbody>${layoutRows}</tbody></table>` : '<p class="note">設備がありません。</p>';
+
+    function renderBars(obj, isRaw = false) {
+      const entries = Object.entries(obj).map(([k, v]) => [k, isRaw ? v : v.exact]).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(1, ...entries.map(x => x[1]));
+      return entries.length ? entries.map(([k, v]) => 
+        `<div class="bar-row"><span>${escapeHtml(k)}</span><div class="bar-track"><div class="bar-fill ${isRaw ? 'raw-fill' : ''}" style="width:${Math.max(0, Math.min(100, (v / max) * 100))}%"></div></div><b>${fmt(v)}${isRaw ? ' /分' : ' 台'}</b></div>`
+      ).join("") : '<p class="note">データなし</p>';
+    }
+
+    $("machineChart").innerHTML = renderBars(machineGroups);
+    $("rawChart").innerHTML = renderBars(totals.raw, true);
+
+    function renderBranch(name, needPerMin, path = [], isTarget = false, depth = 0) {
+      if (depth > 60) return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine error">依存関係が深すぎるため表示を省略しました</div></div>`;
+      const rec = state.recipes.find(x => x.name === name);
+      const qty = displayRate(needPerMin);
+      if (!rec || RAW_NAMES.has(name)) {
+        return `<div class="tree-item raw-item"><div class="tree-head"><b>🟢 ${escapeHtml(name)}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine">必要素材</div></div>`;
+      }
+      if (path.includes(name)) return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine error">循環レシピ</div></div>`;
+      if (rec.cat === "fluidcraft" && $("assembler").value === "1") return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine warn">組立機1では製造できません</div></div>`;
+
+      const moduleFx = moduleEffectsFor(rec);
+      const effectiveProd = machineBaseProductivity(rec.cat) + (canApplyProductivity(rec) ? researchProd + moduleFx.productivity : 0);
+      const crafts = needPerMin / (expectedRecipeOutput(rec, rec.mainProduct || rec.name) * (1 + effectiveProd));
+      const count = crafts / (60 * selectedSpeed(rec.cat) * (1 + researchSpeed + moduleFx.speed) / rec.time * uptime);
+      const child = Object.entries(rec.in || {}).map(([ingredient, amount]) => renderBranch(ingredient, crafts * amount, [...path, name], false, depth + 1)).join("");
+      const byproductText = Object.entries(recipeSideProducts(rec)).map(([product, amount]) => `${escapeHtml(product)} ${fmtExpected(crafts * amount)} ${escapeHtml(unitTxt)}（期待値・相殺前）`).join("、");
+
+      return `<div class="tree-item ${isTarget ? "final-item" : ""}"><div class="tree-head"><b>${isTarget ? "🟠 " : ""}${escapeHtml(name)}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine"><span class="tree-label">必要設備</span>${escapeHtml(machineInfo(rec.cat).name)} ${fmt(count)} 台（実機 ${Math.ceil(count - 1e-9)} 台）${rec.planet ? `<div class="note">生産惑星：${escapeHtml(rec.planet)}${rec.surface ? ` / 地表条件：${escapeHtml(rec.surface)}` : ""}</div>` : ""}${byproductText ? `<div class="note">副産物：${byproductText}</div>` : ""}</div>${child ? `<div class="tree-branch">${child}</div>` : ""}</div>`;
+    }
+
+    $("tree").innerHTML = `<div class="tree-legend"><span><i class="legend-dot final"></i>目標アイテム</span><span><i class="legend-dot"></i>中間素材</span><span><i class="legend-dot raw"></i>原材料</span></div>` +
+      targets.map(t => `<div class="tree-root"><div class="tree-root-title"><strong>完成品：${escapeHtml(t.name)}</strong><span class="tree-qty">${fmt(displayRate(t.rate))} ${escapeHtml(unitTxt)}</span></div><div class="tree-branch">${renderBranch(t.name, t.rate, [], true)}</div></div>`).join("");
+
+    if (totals.errors.length) {
+      setStatusMessage("計算上の注意・問題：" + [...new Set(totals.errors)].join(" / "), "error");
+    } else if (totals.notes.length) {
+      setStatusMessage("計算完了。一部モジュールは設備スロット上限に合わせて調整しました。", "info");
+    } else {
+      setStatusMessage("計算完了。複数目標の共通素材・設備を合算しました。", "success");
+    }
+    window.lastCalculation = { targets, totals, unitTxt };
+  }
+
+  function showPage(pageId) {
+    ["calculatorPage","catalogPage"].forEach(id => $(id).classList.toggle("hidden", id !== pageId));
+    document.querySelectorAll(".page-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.page === pageId));
+    if (pageId === "catalogPage") renderSupportedItems();
+  }
+  document.querySelectorAll(".page-tab").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+  function showAnalysis(panelId) {
+    document.querySelectorAll(".analysis-view").forEach(panel => panel.classList.toggle("hidden", panel.id !== panelId));
+    document.querySelectorAll(".analysis-tab").forEach(btn => {
+      const active = btn.dataset.analysis === panelId;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+  document.querySelectorAll(".analysis-tab").forEach(btn => btn.addEventListener("click", () => showAnalysis(btn.dataset.analysis)));
+
+  $("planetFilter")?.addEventListener("change", populate);
+  $("imageItemSelect").addEventListener("change", updateImageSettingFields);
+  $("saveItemImageBtn").onclick = () => {
+    const name = $("imageItemSelect").value;
+    if (!name) return;
+    const url = $("itemImageUrl").value.trim();
+    if (url) {
+      try { const parsed = new URL(url); if (!["http:","https:"].includes(parsed.protocol) && !(parsed.protocol === "data:" && /^data:image\//i.test(url))) throw new Error(); }
+      catch (_) { $("itemImageMsg").textContent = "有効な画像URLを入力してください。"; return; }
+      itemImages[name] = url;
+    } else {
+      delete itemImages[name];
+    }
+    if (saveItemImages()) {
+      $("itemImageMsg").textContent = itemImages[name] ? "カスタム画像を保存しました。" : "自動画像に戻しました。";
+      renderSupportedItems();
+    }
+  };
+  $("itemImageFile").addEventListener("change", async e => {
+    const file = e.target.files?.[0], name = $("imageItemSelect").value;
+    if (!file || !name) return;
+    if (!file.type.startsWith("image/")) { $("itemImageMsg").textContent = "画像ファイルを選択してください。"; return; }
+    if (file.size > 1500000) { $("itemImageMsg").textContent = "画像は1.5MB以下にしてください。"; e.target.value=""; return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      itemImages[name] = String(reader.result);
+      if (saveItemImages()) {
+        $("itemImageUrl").value = "";
+        $("itemImageMsg").textContent = "画像ファイルを保存しました。";
+        renderSupportedItems();
+      }
+    };
+    reader.onerror = () => $("itemImageMsg").textContent = "画像を読み込めませんでした。";
+    reader.readAsDataURL(file);
+  });
+  $("resetItemImageBtn").onclick = () => {
+    const name = $("imageItemSelect").value;
+    if (!name) return;
+    delete itemImages[name];
+    if (saveItemImages()) {
+      updateImageSettingFields();
+      renderSupportedItems();
+    }
+  };
+
+  function closeModal(e) { if (e) e.preventDefault(); $("adminModal").classList.add("hidden"); }
+  function openModal(e) { if (e) e.preventDefault(); $("adminModal").classList.remove("hidden"); }
+
+  $("adminToggleBtn").onclick = openModal;
+  $("closeAdminBtn").onclick = closeModal;
+  $("backToMainBtn").onclick = closeModal;
+  $("adminModal").onclick = (e) => { if (e.target === $("adminModal")) closeModal(e); };
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !$("adminModal").classList.contains("hidden")) closeModal(e);
+  });
+
+  $("addPlanTargetBtn").onclick = () => {
+    const name = $("target").value;
+    const rate = getRateInMin();
+    if (!name || !Number.isFinite(rate) || rate <= 0) {
+      alert('アイテムと正の目標数量を指定してください。');
+      return;
+    }
+    const existing = state.productionPlan.find(x => x.name === name);
+    if (existing) existing.rate += rate;
+    else state.productionPlan.push({ name, rate });
+    renderProductionPlan();
+    calc();
+  };
+
+  $("clearPlanBtn").onclick = () => {
+    state.productionPlan = [];
+    renderProductionPlan();
+    calc();
+  };
+
+  $("itemSearch").oninput = populate;
+  $("categoryFilter").onchange = populate;
+  $("supportedItemSearch").oninput = renderSupportedItems;
+  $("supportedItemCategory").onchange = renderSupportedItems;
+  $("target").onchange = () => {
+    document.querySelectorAll(".quickbtn").forEach(b => b.classList.toggle("active", b.dataset.item === $("target").value));
+  };
+
+  document.querySelectorAll(".quickbtn").forEach(b => {
+    b.onclick = () => {
+      $("categoryFilter").value = "all";
+      $("itemSearch").value = "";
+      populate();
+      $("target").value = b.dataset.item;
+      document.querySelectorAll(".quickbtn").forEach(x => x.classList.toggle("active", x === b));
+    };
+  });
+
+  $("calc").onclick = calc;
+  ["productivityBonus", "speedBonus", "uptime", "beltType", "moduleTier", "machineSpeedModules", "machineProdModules", "machineEfficiencyModules", "beaconsPerMachine", "beaconModuleType", "beaconModuleCount"].forEach(id => $(id).addEventListener("change", () => { try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings())); } catch (_) {} calc(); }));
+
+  $("reset").onclick = () => {
+    state.productionPlan = [];
+    renderProductionPlan();
+    $("rate").value = 60;
+    $("assembler").value = "3";
+    $("furnace").value = "electric";
+    $("productivityBonus").value = 0;
+    $("speedBonus").value = 0;
+    $("uptime").value = 100;
+    $("beltType").value = "15";
+    $("moduleTier").value = "3";
+    $("machineSpeedModules").value = "0";
+    $("machineProdModules").value = "0";
+    $("machineEfficiencyModules").value = "0";
+    $("beaconsPerMachine").value = "0";
+    $("beaconModuleType").value = "speed";
+    $("beaconModuleCount").value = "2";
+    $("itemSearch").value = "";
+    $("categoryFilter").value = "all";
+    populate();
+    $("target").value = "電子基板";
+    calc();
+  };
+
+  $("exportCsvBtn").onclick = () => {
+    if (!window.lastCalculation) { alert('先に計算してください。'); return; }
+    const { targets, totals } = window.lastCalculation;
+    const rows = [['区分', '名称', '理論数量', '切り上げ数量', '単位', '電力kW']];
+    targets.forEach(t => rows.push(['完成品', t.name, t.rate, '', '個/分', '']));
+    Object.values(totals.machines).forEach(v => rows.push(['設備', `${v.machineName} / ${v.recipeName}`, v.exact, v.rounded, '台', v.powerKw]));
+    Object.entries(totals.raw).forEach(([k, v]) => rows.push(['素材', k, v, '', '個/分', '']));
+    Object.entries(totals.byproducts || {}).forEach(([k, v]) => rows.push(['副産物（相殺前）', k, v, '', '個/分', '']));
+    
+    const csv = '\ufeff' + rows.map(r => r.map(x => '"' + String(x).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'factorio-production-plan.csv';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  $("saveStorageBtn").onclick = () => {
+    try {
+      localStorage.setItem(RECIPE_STORAGE_KEY, JSON.stringify(state.recipes));
+      localStorage.setItem(RECIPE_VERSION_KEY, "7.0");
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings()));
+      alert("レシピと計算設定をブラウザに保存しました。");
+    } catch(err) {
+      alert("保存失敗：容量制限を超えた可能性があります。");
+    }
+  };
+
+  $("resetStorageBtn").onclick = () => {
+    if (confirm("カスタムレシピをリセットして初期データに戻しますか？")) {
+      localStorage.removeItem(RECIPE_STORAGE_KEY);
+      localStorage.removeItem(RECIPE_VERSION_KEY);
+      localStorage.removeItem(SETTINGS_STORAGE_KEY);
+      state.recipes = JSON.parse(JSON.stringify(DEFAULT_RECIPES));
+      populate();
+      refreshRecipeEditor();
+      calc();
+      alert("初期設定にリセットしました。");
+    }
+  };
+
+  $("applyJsonTextBtn").onclick = () => {
+    try {
+      const data = JSON.parse($("recipeJsonEditor").value);
+      validateRecipes(data);
+      state.recipes = data;
+      populate();
+      refreshRecipeEditor();
+      calc();
+      alert("JSONデータを適用しました。");
+    } catch (e) {
+      alert("JSON解析エラー: " + e.message);
+    }
+  };
+
+  $("export").onclick = () => {
+    const blob = new Blob([JSON.stringify(state.recipes, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "factorio-recipes-custom.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  $("import").onchange = async (e) => {
+    try {
+      const data = JSON.parse(await e.target.files[0].text());
+      validateRecipes(data);
+      state.recipes = data;
+      $("datasetLabel").value = "カスタムJSON";
+      populate();
+      refreshRecipeEditor();
+      calc();
+      alert("レシピJSONをインポートしました。");
+    } catch (err) {
+      alert("読み込みエラー: " + err.message);
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  ["speedA1", "speedA2", "speedA3"].forEach(id => {
+    $(id).onchange = calc;
+  });
+
+  function refreshRecipeEditor() {
+    const sel = $("recipeEditSelect");
+    const old = sel.value;
+    sel.innerHTML = '<option value="">新規レシピ</option>' + state.recipes.map(r => `<option value="${escapeHtml(r.id)}">${escapeHtml(r.name)}</option>`).join("");
+    if (state.recipes.some(r => r.id === old)) sel.value = old;
+  }
+
+  function clearRecipeEditor() {
+    $("recipeEditSelect").value = "";
+    $("editRecipeId").value = "";
+    $("editRecipeName").value = "";
+    $("editRecipeCat").value = "craft";
+    $("editRecipeTime").value = "1";
+    $("editRecipeOut").value = "1";
+    $("editRecipeInputs").value = "{}";
+    $("recipeEditMsg").textContent = "新規レシピを入力してください。";
+  }
+
+  $("recipeEditSelect").addEventListener("change", () => {
+    const r = state.recipes.find(x => x.id === $("recipeEditSelect").value);
+    if (!r) { clearRecipeEditor(); return; }
+    $("editRecipeId").value = r.id;
+    $("editRecipeName").value = r.name;
+    $("editRecipeCat").value = r.cat;
+    $("editRecipeTime").value = r.time;
+    $("editRecipeOut").value = r.out;
+    $("editRecipeInputs").value = JSON.stringify(r.in, null, 2);
+    $("recipeEditMsg").textContent = "編集中：" + r.name;
+  });
+
+  $("clearRecipeEditBtn").onclick = clearRecipeEditor;
+
+  $("saveRecipeEditBtn").onclick = () => {
+    try {
+      const r = {
+        id: $("editRecipeId").value.trim(),
+        name: $("editRecipeName").value.trim(),
+        cat: $("editRecipeCat").value,
+        time: Number($("editRecipeTime").value),
+        out: Number($("editRecipeOut").value),
+        in: JSON.parse($("editRecipeInputs").value || "{}")
+      };
+      const previousId = $("recipeEditSelect").value;
+      const next = state.recipes.filter(x => x.id !== previousId);
+      next.push(r);
+      validateRecipes(next);
+      state.recipes = next;
+      populate();
+      refreshRecipeEditor();
+      $("recipeEditSelect").value = r.id;
+      $("recipeEditMsg").textContent = "保存しました。";
+      calc();
+    } catch (e) {
+      $("recipeEditMsg").textContent = "保存できません：" + e.message;
+    }
+  };
+
+  $("deleteRecipeEditBtn").onclick = () => {
+    const id = $("recipeEditSelect").value;
+    if (!id) { $("recipeEditMsg").textContent = "削除するレシピを選択してください。"; return; }
+    if (!confirm("選択したレシピを削除しますか？")) return;
+    state.recipes = state.recipes.filter(r => r.id !== id);
+    populate();
+    refreshRecipeEditor();
+    clearRecipeEditor();
+    calc();
+  };
+
+  function parseFactorioDataRaw(root) {
+    const raw = root?.data?.raw || root?.raw || root;
+    const source = raw?.recipe;
+    if (!source || typeof source !== "object") throw new Error("data.raw.recipe が見つかりません。レシピprototypeを含むJSONを選択してください。");
+    if (raw?.fluid && typeof raw.fluid === "object") Object.keys(raw.fluid).forEach(name => FLUID_NAMES.add(name));
+    const imported = []; let skipped = 0;
+    const toMap = list => {
+      const out = {};
+      if (Array.isArray(list)) {
+        for (const x of list) {
+          if (!x || typeof x.name !== "string") return null;
+          const amount = x.amount != null ? Number(x.amount) : (x.amount_min != null && x.amount_max != null ? (Number(x.amount_min)+Number(x.amount_max))/2 : NaN);
+          if (!Number.isFinite(amount) || amount <= 0 || (x.probability != null && (!Number.isFinite(Number(x.probability)) || Number(x.probability) < 0 || Number(x.probability) > 1))) return null;
+          const expected = amount * (x.probability == null ? 1 : Number(x.probability));
+          out[x.name] = (out[x.name] || 0) + expected;
+        }
+      } else if (list && typeof list === "object") {
+        for (const [name, amount] of Object.entries(list)) {
+          const n = Array.isArray(amount) ? Number(amount[1]) : Number(amount);
+          if (!Number.isFinite(n) || n <= 0) return null;
+          out[name] = n;
+        }
+      } else return null;
+      return out;
+    };
+    const parseResults = list => {
+      if (!Array.isArray(list) || !list.length) return null;
+      const parsed = [];
+      for (const x of list) {
+        if (!x || typeof x.name !== "string") return null;
+        const amount = x.amount != null ? Number(x.amount) : (x.amount_min != null && x.amount_max != null ? (Number(x.amount_min)+Number(x.amount_max))/2 : NaN);
+        const probability = x.probability == null ? 1 : Number(x.probability);
+        if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(probability) || probability < 0 || probability > 1) return null;
+        parsed.push({name:x.name, amount, probability});
+      }
+      return parsed;
+    };
+    for (const [id, r] of Object.entries(source)) {
+      if (!r || typeof r !== "object" || r.hidden) { skipped++; continue; }
+      const rawResults = parseResults(r.results || (r.result ? [{name:r.result, amount:r.result_count ?? 1}] : null));
+      const inputs = toMap(r.ingredients);
+      const time = Number(r.energy_required ?? 0.5);
+      if (!rawResults || !inputs || !Object.keys(inputs).length || !Number.isFinite(time) || time <= 0) { skipped++; continue; }
+      const mainName = typeof r.main_product === "string" && r.main_product ? r.main_product : rawResults[0].name;
+      const mainResult = rawResults.find(x => x.name === mainName);
+      if (!mainResult) { skipped++; continue; }
+      const name = mainName, out = mainResult.amount * mainResult.probability;
+      const surface = Array.isArray(r.surface_conditions) ? r.surface_conditions.map(c => {
+        const prop = c.property === "pressure" ? "圧力" : c.property === "magnetic-field" ? "磁場" : c.property === "gravity" ? "重力" : c.property;
+        return `${prop} ${c.min ?? "?"}${c.max != null && c.max !== c.min ? `〜${c.max}` : ""}`;
+      }).join(" / ") : "";
+      const planet = Array.isArray(r.surface_conditions) ? (r.surface_conditions.some(c=>c.property==="pressure" && Number(c.min)===2000) ? "グレバ" : r.surface_conditions.some(c=>c.property==="pressure" && Number(c.min)===4000) ? "ヴルカヌス" : r.surface_conditions.some(c=>c.property==="magnetic-field" && Number(c.min)===99) ? "フルゴラ" : r.surface_conditions.some(c=>c.property==="pressure" && Number(c.min)===300) ? "アクィロ" : r.surface_conditions.some(c=>c.property==="gravity" && Number(c.min)===0) ? "宇宙空間" : "") : "";
+      const categoryMap = {
+        "crafting": "craft", "basic-crafting": "craft", "craft": "craft",
+        "advanced-crafting": "advanced", "crafting-with-fluid": "fluidcraft",
+        "smelting": "smelt", "chemistry": "chem", "rocket-building": "rocket",
+        "metallurgy": "foundry", "organic": "bio", "electromagnetics": "electromagnetic", "cryogenics": "cryo"
+      };
+      const sourceCategories = Array.isArray(r.categories) ? r.categories : [r.category || "crafting"];
+      const mappedCategories = sourceCategories.map(x => categoryMap[String(x)]).filter(Boolean);
+      // A recipe that supports several machine categories is assigned to its specialized Space Age machine first.
+      if (!mappedCategories.length || sourceCategories.some(x => !categoryMap[String(x)])) { skipped++; continue; }
+      const cat = mappedCategories.find(x => ["bio","foundry","electromagnetic","cryo"].includes(x)) || mappedCategories[0];
+      const importedRecipe = {id:String(id), name, time, cat, out, in:inputs, mainProduct:name, results:rawResults, allowProductivity:r.allow_productivity !== false};
+      if (planet) importedRecipe.planet = planet;
+      if (surface) importedRecipe.surface = surface;
+      const sideProducts = {};
+      rawResults.forEach(p => { if (p.name !== name) sideProducts[p.name] = (sideProducts[p.name] || 0) + p.amount * p.probability; });
+      if (Object.keys(sideProducts).length) importedRecipe.byproducts = sideProducts;
+      imported.push(importedRecipe);
+    }
+    if (!imported.length) throw new Error("取り込めるレシピがありませんでした。");
+    const seen = new Set();
+    const unique = imported.filter(r => { if (seen.has(r.name)) { skipped++; return false; } seen.add(r.name); return true; });
+    validateRecipes(unique);
+    return {recipes:unique, skipped};
+  }
+
+  $("importFactorioData").onchange = async e => {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+      const result = parseFactorioDataRaw(JSON.parse(await file.text()));
+      state.recipes = result.recipes; $("datasetLabel").value = file.name;
+      populate(); refreshRecipeEditor(); calc();
+      $("factorioImportMsg").textContent = `${result.recipes.length}件を取り込みました。対象外・重複 ${result.skipped}件を除外しました。`;
+    } catch (err) { $("factorioImportMsg").textContent = "取り込み失敗：" + err.message; }
+    finally { e.target.value = ""; }
+  };
+
+  function currentSettings() {
+    return {rate:$('rate').value,unit:'min',assembler:$('assembler').value,furnace:$('furnace').value,
+      precision:'0',rounding:'ceil',productivityBonus:$('productivityBonus').value,
+      speedBonus:$('speedBonus').value,uptime:$('uptime').value,beltType:$('beltType').value,
+      speedA1:$('speedA1').value,speedA2:$('speedA2').value,speedA3:$('speedA3').value,
+      moduleTier:$('moduleTier').value,machineSpeedModules:$('machineSpeedModules').value,machineProdModules:$('machineProdModules').value,
+      machineEfficiencyModules:$('machineEfficiencyModules').value,beaconsPerMachine:$('beaconsPerMachine').value,
+      beaconModuleType:$('beaconModuleType').value,beaconModuleCount:$('beaconModuleCount').value,datasetLabel:$('datasetLabel').value};
+  }
+  function applySettings(settings) {
+    const allowed={unit:['min','sec','hour'],assembler:['1','2','3'],furnace:['stone','steel','electric'],precision:['0','2','3'],rounding:['exact','ceil'],beltType:['15','30','45'],moduleTier:['1','2','3'],beaconModuleType:['speed','efficiency']};
+    for (const [id,value] of Object.entries(settings || {})) {
+      const el=$(id); if(!el || !('value' in el)) continue;
+      if(allowed[id] && !allowed[id].includes(String(value))) continue;
+      if(el.type==='number') { const n=Number(value); if(!Number.isFinite(n)) continue; const min=el.min===''?-Infinity:Number(el.min), max=el.max===''?Infinity:Number(el.max); el.value=String(Math.min(max,Math.max(min,n))); }
+      else el.value=String(value).slice(0,200);
+    }
+    enforceFixedCalculationSettings();
+  }
+  $('backupAllBtn').onclick=()=>{
+    const backup={format:'factorio-production-calculator-backup',version:8,exportedAt:new Date().toISOString(),
+      datasetLabel:$('datasetLabel').value,recipes:state.recipes,settings:currentSettings(),productionPlan:state.productionPlan,itemImages};
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download='factorio-calculator-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  $('restoreAllInput').onchange=async e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    try {
+      const data=JSON.parse(await file.text());
+      if(data?.format!=='factorio-production-calculator-backup'||!Array.isArray(data.recipes))throw new Error('このアプリのバックアップ形式ではありません。');
+      const recipes=validateRecipes(data.recipes);
+      const plan=Array.isArray(data.productionPlan)?data.productionPlan.filter(x=>x&&typeof x.name==='string'&&recipes.some(r=>r.name===x.name)&&Number.isFinite(Number(x.rate))&&Number(x.rate)>=0.01).map(x=>({name:x.name,rate:Number(x.rate)})):[];
+      const restoredImages = (data.itemImages && typeof data.itemImages === "object" && !Array.isArray(data.itemImages)) ? data.itemImages : {};
+      const safeImages = {};
+      for (const [name, value] of Object.entries(restoredImages)) {
+        if (typeof name === "string" && typeof value === "string" && value.length <= 2_000_000 && (/^https?:\/\//i.test(value) || /^data:image\//i.test(value))) safeImages[name] = value;
+      }
+      const previousImages = itemImages;
+      itemImages = safeImages;
+      if (!saveItemImages()) { itemImages = previousImages; throw new Error("画像設定を保存できませんでした。容量を確認してください。"); }
+      state.recipes=recipes;state.productionPlan=plan;applySettings(data.settings);
+      $('datasetLabel').value=String(data.datasetLabel||'復元データ').slice(0,200);
+      localStorage.setItem(RECIPE_STORAGE_KEY,JSON.stringify(state.recipes));
+      localStorage.setItem(RECIPE_VERSION_KEY, "7.0");
+      localStorage.setItem(SETTINGS_STORAGE_KEY,JSON.stringify(currentSettings()));
+      populate();refreshRecipeEditor();renderProductionPlan();calc();alert('バックアップを復元しました。');
+    } catch(err){alert('復元できません：'+err.message);} finally{e.target.value='';}
+  };
+  try { const saved=JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY)||'null');if(saved)applySettings(saved); } catch(_){}
+  ['rate','unit','assembler','furnace','precision','rounding','productivityBonus','speedBonus','uptime','beltType','speedA1','speedA2','speedA3','moduleTier','machineSpeedModules','machineProdModules','machineEfficiencyModules','beaconsPerMachine','beaconModuleType','beaconModuleCount'].forEach(id=>{
+    const el = $(id);
+    if (el) el.addEventListener('change',()=>{
+      try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(currentSettings())); } catch (_) {}
+    });
+  });
+
+  loadRecipes();
+  try {
+    const savedPlan = JSON.parse(localStorage.getItem(PLAN_STORAGE_KEY) || "[]");
+    if (Array.isArray(savedPlan)) state.productionPlan = savedPlan.filter(x => x && typeof x.name === "string" && state.recipes.some(r => r.name === x.name) && Number.isFinite(Number(x.rate)) && Number(x.rate) >= 0.01).map(x => ({ name: x.name, rate: Number(x.rate) }));
+  } catch (_) { state.productionPlan = []; }
+  populate();
+  renderProductionPlan();
+  refreshRecipeEditor();
+  $("target").value = "電子基板";
+  calc();
+})();
+</script>
+
+<script>
+(() => {
+ const translations = {"標準ではFactorio Wikiのアイコン画像を自動表示します。アイテムごとに画像URLを指定するか、画像ファイルを登録して上書きできます。":"By default, item icons are loaded from the Factorio Wiki. You can override them with an image URL or an uploaded image file.","選択中のアイテムと目標数量を計画に追加すると、複数の完成品をまとめて計算できます。数量は個/分で登録します。":"Add the selected item and target rate to calculate multiple products together. Rates are entered as items per minute.","1列あたり最大10台として、設備の列数と配置台数を概算します。実際のベルト・流体配管・通路幅は含みません。":"Estimates the number of machine rows and machines, with up to 10 machines per row. Actual belt, pipe, and walkway widths are not included.","保存失敗：ストレージの容量制限を超えました。ファイルサイズを小さくするかURLをご利用ください。":"Save failed: storage limit exceeded. Reduce the file size or use an image URL.","このデータセットには生産レシピが登録されていません。原材料として集計されます。":"No production recipe is registered for this dataset. It will be counted as a raw material.","レシピを選択して編集、または新規作成できます。材料欄はJSON形式です（例：":"Select a recipe to edit or create a new one. Ingredients use JSON format (e.g. ","Space Age専用ページ｜確率成果物・複数成果物・惑星条件に対応":"Space Age Calculator | Probabilistic Outputs, Multiple Products & Planetary Conditions","該当するアイテムはありません。検索語やカテゴリを変更してください。":"No matching items. Try changing your search term or category.","アイテムと目標数量を選んで「生産ラインを計算」を押してください。":"Select an item and target rate, then click “Calculate Production”.","計画はまだありません。未登録の場合は上の単一目標で計算します。":"No items in the plan yet. The single target above will be used unless you add items here.","Space Age版では使用惑星・地表条件を表示します。":"Space Age planets and surface conditions will appear here.","Factorio data.raw JSONを取り込む":"Import Factorio data.raw JSON","保存レシピのロード失敗。デフォルト初期化します。":"Failed to load saved recipes. Restoring defaults.","レシピは1件以上の配列形式にしてください。":"Recipes must be provided as an array containing at least one entry.","設備速度カスタマイズ (現在セッション)":"Machine Speed Customization (Current Session)","同梱データ（Space Age対応）":"Built-in Data (Space Age Compatible)","宇宙プラットフォームスターターパック":"Space Platform Starter Pack","FACTORIO / 生産計算機":"FACTORIO / PRODUCTION CALCULATOR","計算後にベルト換算を表示します。":"Belt throughput will appear after calculation.","ビーコン台数（設備1台あたり）":"Beacons per Machine","計算後に電力概算を表示します。":"Estimated power usage will appear after calculation.","計算結果がここに表示されます。":"Production results will appear here.","画像URL（空欄なら自動画像）":"Image URL (leave blank for automatic image)","ユーティリティサイエンスパック":"Utility Science Pack","通常版｜基本レシピの生産計算":"Base Game Production Calculator","選択中のアイテムを計画に追加":"Add Selected Item to Plan","計算後に配置案を表示します。":"A suggested layout will appear after calculation.","名前で検索（例：電子基板）":"Search by name (e.g. Electronic Circuit)","アイテムを選択してください":"Select an item","ビーコン1台あたりの装着数":"Modules per Beacon","カスタム画像を設定中です。":"Custom image is active.","同梱データ（通常版レシピ）":"Built-in Data (Base Game Recipes)","惑星・Space Age":"Planets & Space Age","組立機2（速度0.75）":"Assembler 2 (Speed 0.75)","組立機3（速度1.25）":"Assembler 3 (Speed 1.25)","モジュール・ビーコン設定":"Module & Beacon Settings","設備の生産力モジュール数":"Productivity Modules per Machine","アイテム名・材料名で検索":"Search item or ingredient names","レシピマスターデータ管理":"Recipe Database Management","ロングアームインサーター":"Long-handed Inserter","宇宙プラットフォーム基礎":"Space Platform Foundation","Space Age版へ":"Space Age Version","組立機1（速度0.5）":"Assembler 1 (Speed 0.5)","複数アイテムの生産計画":"Multi-Item Production Plan","生産力ボーナス (%)":"Productivity Bonus (%)","設備の速度モジュール数":"Speed Modules per Machine","設備の効率モジュール数":"Efficiency Modules per Machine","材料のみ（レシピなし）":"Raw Materials Only (No Recipe)","自動画像を使用中です。":"Using automatic image.","自動化サイエンスパック":"Automation Science Pack","タングステンカーバイド":"Tungsten Carbide","フルオロケトン（高温）":"Fluoroketone (Hot)","アステロイドコレクター":"Asteroid Collector","Space Age版":"Space Age","電子部品・モジュール":"Electronics & Modules","速度ボーナス (%)":"Speed Bonus (%)","黄色（15 個/秒）":"Yellow (15 items/s)","赤色（30 個/秒）":"Red (30 items/s)","青色（45 個/秒）":"Blue (45 items/s)","ビーコンのモジュール":"Beacon Module","素材の構成（個/分）":"Material Breakdown (items/min)","計算後に表示します。":"Shown after calculation.","素材ボトルネック診断":"Material Bottleneck Diagnosis","生産レシピ・必要材料":"Recipe & Required Ingredients","必要材料（JSON）":"Ingredients (JSON)","JSONエクスポート":"Export JSON","テキストから直に反映":"Apply Text Directly","件 / 登録レシピ ":" / recipes registered","副産物・確率成果物：":"By-products & probabilistic products:","固形燃料（石油ガス）":"Solid Fuel (Petroleum Gas)","電動エンジンユニット":"Electric Engine Unit","飛行ロボットフレーム":"Flying Robot Frame","スタックインサーター":"Stack Inserter","ロボットステーション":"Roboport","物流サイエンスパック":"物流サイエンスパック","化学サイエンスパック":"Chemical Science Pack","製造サイエンスパック":"Production Science Pack","農業サイエンスパック":"Agricultural Science Pack","冶金サイエンスパック":"Metallurgic Science Pack","電磁サイエンスパック":"Electromagnetic Science Pack","低温サイエンスパック":"Cryogenic Science Pack","宇宙サイエンスパック":"Space Science Pack","鋼鉄の炉（速度2）":"Steel Furnace (Speed 2)","よく使うアイテム：":"Quick Select:","設備稼働率 (%)":"Machine Uptime (%)","推定電力（稼働時）":"Estimated Power (Active)","必要素材・流体一覧":"Required Materials & Fluids","分析表示の切り替え":"Analysis Views","対応アイテムを検索":"Search supported items","カテゴリで絞り込み":"Filter by category","アイテム画像の設定":"Item Image Settings","画像ファイルを登録":"Upload Image File","この画像設定を保存":"Save Image Settings","JSONインポート":"Import JSON","全設定バックアップ":"Back Up All Settings","成果物（期待値）：":"Products (expected):","生産力モジュール2":"Productivity Module 2","生産力モジュール3":"Productivity Module 3","ジェリーナッツの種":"Jellynut Seed","カーボンファイバー":"Carbon Fiber","スーパーキャパシタ":"Supercapacitor","冷却フルオロケトン":"Fluoroketone (Cold)","高温フルオロケトン":"Fluoroketone (Hot)","カスタマイズ設定":"Customization Settings","作りたいアイテム":"Target Item","すべてのカテゴリ":"All Categories","生産するアイテム":"Item to produce","石の炉（速度1）":"Stone Furnace (Speed 1)","電気炉（速度2）":"Electric Furnace (Speed 2)","生産ラインを計算":"Calculate Production","素材・流体の種類":"Material & Fluid Types","結果をCSV出力":"Export Results to CSV","素材ボトルネック":"Material Bottlenecks","対応アイテム一覧":"Supported Items","レシピ・設備設定":"Recipe & Machine Settings","レシピGUI編集":"Recipe Editor","選択レシピを削除":"Delete Selected Recipe","デフォルトに戻す":"Restore Defaults","固形燃料（軽油）":"Solid Fuel (Light Oil)","固形燃料（重油）":"Solid Fuel (Heavy Oil)","エンジンユニット":"Engine Unit","高速インサーター":"Fast Inserter","速度モジュール2":"Speed Module 2","効率モジュール2":"Efficiency Module 2","速度モジュール3":"Speed Module 3","効率モジュール3":"Efficiency Module 3","生産力モジュール":"Productivity Module","超高速搬送ベルト":"Express Transport Belt","連鎖式列車用信号":"Rail Chain Signal","鉄筋コンクリート":"Reinforced Concrete","バイオフラックス":"Bioflux","バイオチャンバー":"Biochamber","ページ切り替え":"Page navigation","素材・中間素材":"Materials & Intermediates","初期設定に戻す":"Reset Defaults","モジュール段階":"Module Tier","速度モジュール":"Speed Module","効率モジュール":"Efficiency Module","必要設備の合計":"Total Machines Required","設備配置の目安":"Machine Layout Estimate","自動画像に戻す":"Use Automatic Image","編集するレシピ":"Recipe to Edit","製造時間（秒）":"Crafting Time (seconds)","ブラウザに保存":"Save to Browser","JSONデータ":"JSON Data","主な生産惑星：":"Primary Production Planet:","生産目標に選択":"Set as Production Target","プラスチック棒":"Plastic Bar","ソーラーパネル":"Solar Panel","高速搬送ベルト":"Fast Transport Belt","ユマコマッシュ":"Mash","ジェリーナッツ":"Jellynut","ホルミウム溶液":"Holmium Solution","量子プロセッサ":"Quantum Processor","ロケットサイロ":"Rocket Silo","アイテム一覧":"Item Catalog","ロケット関連":"Rocket Parts","計画をクリア":"Clear Plan","モジュール1":"Module 1","モジュール2":"Module 2","モジュール3":"Module 3","必要設備一覧":"Required Machines","生産チェーン":"Production Chain","必要数グラフ":"Required Amounts Chart","読み込み中…":"Loading…","対象アイテム":"Target Item","流体対応組立":"Fluid Crafting","レシピを保存":"Save Recipe","入力をクリア":"Clear Fields","ロケット燃料":"Rocket Fuel","インサーター":"Inserter","コンクリート":"Concrete","木製チェスト":"Wooden Chest","鋼鉄チェスト":"Steel Chest","ロケット部品":"Rocket Part","燃料式採掘機":"Burner Mining Drill","化学プラント":"Chemical Plant","蒸気タービン":"Steam Turbine","物流ロボット":"Logistic Robot","建設ロボット":"Construction Robot","ホルミウム板":"Holmium Plate","電磁プラント":"Electromagnetic Plant","低温プラント":"Cryogenic Plant","クラッシャー":"Crusher","ウラン235":"Uranium-235","ウラン238":"Uranium-238","生産計算機":"Production Calculator","物流・輸送":"Logistics & Transport","建築・電力":"Structures & Power","科学・研究":"Science & Research","化学・流体":"Chemistry & Fluids","目標生産量":"Target Production Rate","ベルト種類":"Belt Type","設備の構成":"Machine Breakdown","新規レシピ":"New Recipe","レシピID":"Recipe ID","高度な組立":"Advanced Crafting","全設定復元":"Restore All Settings","個 / 分":"items / min","材料のみ ":"raw materials","（期待値）":"(expected)","必要材料：":"Ingredients:","地表条件：":"Surface Conditions:","軽量化素材":"Low Density Structure","搬送ベルト":"Transport Belt","地下ベルト":"Underground Belt","地下パイプ":"Underground Pipe","電動採掘機":"Electric Mining Drill","原油精製所":"Oil Refinery","貯蔵タンク":"Storage Tank","高速分配器":"Fast Splitter","列車用信号":"Rail Signal","タンク貨車":"Fluid Wagon","ユマコの種":"Yumako Seed","リチウム板":"Lithium Plate","カーゴベイ":"Cargo Bay","スラスター":"Thruster","ヴルカヌス":"Vulcanus","ウラン鉱石":"Uranium Ore","アンモニア":"Ammonia","生産計算":"Calculator","通常版へ":"Base Game Version","生産目標":"Production Target","詳細設定":"Advanced Settings","計算結果":"Calculation Results","分析表示":"Analysis","アイテム":"Item","レシピ名":"Recipe Name","カテゴリ":"Category","ロケット":"Rocket","生産個数":"Output Amount","材料のみ":"Raw Material","石レンガ":"Stone Brick","鉄の歯車":"Iron Gear Wheel","電子基板":"Electronic Circuit","発展基板":"Advanced Circuit","制御基板":"Processing Unit","小型電柱":"Small Electric Pole","中型電柱":"Medium Electric Pole","大型電柱":"Big Electric Pole","組立機1":"Assembling Machine 1","組立機2":"Assembling Machine 2","組立機3":"Assembling Machine 3","レーダー":"Radar","ビーコン":"Beacon","鋼鉄の炉":"Steel Furnace","貨物車両":"Cargo Wagon","蒸気機関":"Steam Engine","ボイラー":"Boiler","超伝導体":"Superconductor","フルゴラ":"Fulgora","アクィロ":"Aquilo","宇宙空間":"Space","石油ガス":"Petroleum Gas","通常版":"Base Game","組立機":"Assembler","精錬炉":"Furnace","閉じる":"Close","表示 ":"Showing ","鉄の棒":"Iron Stick","パイプ":"Pipe","潤滑油":"Lubricant","分配器":"Splitter","電気炉":"Electric Furnace","蓄電池":"Accumulator","研究所":"Lab","レール":"Rail","石の炉":"Stone Furnace","ポンプ":"Pump","機関車":"Locomotive","ユマコ":"Yumako","ゼリー":"Jelly","栄養素":"Nutrients","鋳造炉":"Foundry","電解液":"Electrolyte","グレバ":"Gleba","鉄鉱石":"Iron Ore","銅鉱石":"Copper Ore","溶融銅":"Molten Copper","溶融鉄":"Molten Iron","区分":"Type","組立":"Crafting","精錬":"Smelting","化学":"Chemistry","種類":"types","鉄板":"Iron Plate","銅板":"Copper Plate","鋼材":"Steel Plate","銅線":"Copper Cable","硫黄":"Sulfur","硫酸":"Sulfuric Acid","電池":"Battery","石壁":"Stone Wall","油井":"Pumpjack","炭素":"Carbon","石炭":"Coal","木材":"Wood","重油":"Heavy Oil","軽油":"Light Oil","原油":"Crude Oil","速度":"Speed","圧力":"Pressure","磁場":"Magnetic Field","駅":"Train Stop","石":"Stone","水":"Water","氷":"Ice"};
+ const keys = Object.keys(translations).sort((a,b)=>b.length-a.length);
+ const pattern = new RegExp(keys.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\</body>')).join('|'),'g');
+ const translate = value => String(value).replace(pattern, match => translations[match] || match);
+ const skip = node => node.parentElement && /^(SCRIPT|STYLE|TEXTAREA|CODE|PRE)$/.test(node.parentElement.tagName);
+ const walk = root => {
+   if(root.nodeType===Node.TEXT_NODE){if(!skip(root)) {const next=translate(root.nodeValue);if(next!==root.nodeValue)root.nodeValue=next;}return;}
+   if(root.nodeType!==Node.ELEMENT_NODE && root.nodeType!==Node.DOCUMENT_NODE)return;
+   if(root.nodeType===Node.ELEMENT_NODE){
+     for(const attr of ['placeholder','title','aria-label']) if(root.hasAttribute(attr)){const v=translate(root.getAttribute(attr));if(v!==root.getAttribute(attr))root.setAttribute(attr,v);}
+   }
+   root.childNodes.forEach(walk);
+ };
+ walk(document.body);
+ new MutationObserver(records=>records.forEach(record=>{
+   if(record.type==='childList')record.addedNodes.forEach(walk);
+   else if(record.type==='characterData')walk(record.target);
+   else if(record.type==='attributes')walk(record.target);
+ })).observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['placeholder','title','aria-label']});
+})();
+</script></body>
+</html>
