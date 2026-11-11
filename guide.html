@@ -2,128 +2,36 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#171a1d">
-<meta name="description" content="Factorio生産計算機の使い方を解説。通常版とSpace Age版の選び方、生産量・設備・モジュール設定、レシピデータの保存や読み込み、よくある質問を紹介します。">
-<meta name="robots" content="index,follow">
-<link rel="canonical" href="https://hinatasato101008-web.github.io/factorio-production-calculator/guide.html">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Factorio生産計算機の使い方・FAQ">
-<meta property="og:description" content="通常版とSpace Age版の選び方から、生産設定・データ管理まで解説します。">
-<meta property="og:url" content="https://hinatasato101008-web.github.io/factorio-production-calculator/guide.html">
-<title>Factorio生産計算機の使い方・FAQ｜Factorio Production Calculator</title>
+<meta name="description" content="Factorio Production Calculatorの使い方、通常版とSpace Age版の違い、よくある質問。">
+<title>使い方・FAQ | Factorio Production Calculator</title>
 <style>
-:root{color-scheme:dark;--bg:#171a1d;--surface:#202428;--border:#383f44;--text:#e6e8e9;--muted:#a0a7ac;--accent:#d58a38}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.8 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.wrap{width:min(820px,calc(100% - 34px));margin:auto}header{border-bottom:1px solid var(--border);padding:17px 0;background:#191d20}
-a{color:#e5ad68;text-decoration:none}a:hover{text-decoration:underline}.brand{font-size:13px;font-weight:700;letter-spacing:.03em;color:var(--text)}
-main{padding:42px 0 70px}h1{font-size:clamp(26px,5vw,36px);line-height:1.3;margin:0 0 12px}h2{font-size:20px;margin:38px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}h3{font-size:16px;margin:22px 0 6px}p{margin:8px 0;color:#c5cbd0}.lead{color:var(--muted);margin-bottom:25px}.panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:17px 19px;margin:16px 0}.panel p:last-child{margin-bottom:0}ul,ol{padding-left:1.4em;color:#c5cbd0}li{margin:5px 0}.note{font-size:13px;color:var(--muted)}.cta{display:inline-block;background:#8d5b25;color:#fff;padding:10px 16px;border-radius:4px;font-weight:650;margin:8px 0}footer{border-top:1px solid var(--border);padding:20px 0;color:var(--muted);font-size:12px}
+:root{color-scheme:dark;--bg:#171a1d;--surface:#202428;--surface2:#1b1f22;--border:#383f44;--text:#e6e8e9;--muted:#a0a7ac;--accent:#d58a38}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:78px}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.75}a{color:#e0a45e;text-decoration:none}a:hover{text-decoration:underline}.wrap{width:min(900px,calc(100% - 36px));margin:auto}header{height:62px;border-bottom:1px solid var(--border);background:#191d20;display:flex;align-items:center}.nav{display:flex;justify-content:space-between;align-items:center;gap:18px}.logo{font-size:13px;font-weight:650;color:var(--text);letter-spacing:.02em}nav{display:flex;gap:18px;font-size:13px;color:var(--muted)}main{padding:42px 0 70px}.kicker{font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.1em}h1{font-size:clamp(26px,4vw,34px);line-height:1.3;margin:7px 0 8px} .lead{color:var(--muted);margin:0 0 28px;font-size:14px}.layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;align-items:start}.toc{position:sticky;top:18px;background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:16px}.toc strong{display:block;font-size:13px;margin-bottom:8px}.toc a{display:block;color:var(--muted);font-size:12px;padding:5px 0}.content section{margin:0 0 34px}.content h2{font-size:19px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}.content h3{font-size:15px;margin:20px 0 5px}.content p,.content li{font-size:13px;color:#c5cace}.content p{margin:7px 0}.content ul,.content ol{padding-left:21px}.note{padding:12px 14px;background:var(--surface);border-left:3px solid var(--accent);margin:14px 0;font-size:12px;color:#c5cace}.faq{border:1px solid var(--border);border-radius:4px;margin:9px 0;background:var(--surface2)}.faq summary{cursor:pointer;padding:11px 13px;font-size:13px;font-weight:600}.faq p{padding:0 13px 12px;margin:0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.action{display:inline-block;padding:9px 13px;border:1px solid var(--border);border-radius:4px;background:var(--surface);font-size:12px;color:var(--text)}footer{border-top:1px solid var(--border);padding:18px 0;color:#858d92;font-size:11px}@media(max-width:680px){header{height:auto;min-height:56px}.nav{padding:10px 0;align-items:flex-start;flex-direction:column;gap:6px}nav{gap:15px}.layout{grid-template-columns:1fr;gap:18px}.toc{position:static}.toc-links{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}main{padding-top:30px}}
 </style>
-<script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"FAQPage",
- "mainEntity":[
-  {"@type":"Question","name":"通常版とSpace Age版はどう選べばよいですか？","acceptedAnswer":{"@type":"Answer","text":"Factorio本編のレシピを使う場合は通常版、Space Age拡張のレシピを使う場合はSpace Age版を選択してください。"}},
-  {"@type":"Question","name":"生産量の単位や設備設定は変更できますか？","acceptedAnswer":{"@type":"Answer","text":"計算機では生産レートの単位、組立機や炉、モジュール、ビーコンなどの設定を調整できます。"}},
-  {"@type":"Question","name":"レシピデータや設定を保存できますか？","acceptedAnswer":{"@type":"Answer","text":"計算機にはデータのインポートやバックアップの保存・復元機能があります。"}}
- ]
-}
-</script>
 </head>
 <body>
-<header><div class="wrap"><a class="brand" href="index.html">FACTORIO / PRODUCTION CALCULATOR</a></div></header>
+<header><div class="wrap nav"><a class="logo" href="index.html">FACTORIO / PRODUCTION CALCULATOR</a><nav><a href="index.html">ホーム</a><a href="calculator.html">計算機</a></nav></div></header>
 <main class="wrap">
-<div class="note">GUIDE / HELP</div>
-<h1>Factorio生産計算機の使い方</h1>
-<p class="lead">生産したいアイテムのレシピをもとに、必要な素材や設備を考えるためのガイドです。このページでは計算機の基本的な使い方と設定項目を紹介します。</p>
-<a class="cta" href="calculator.html">生産計算機を開く</a>
-<div class="panel" aria-label="ページ内目次">
-<strong>このガイドの内容</strong>
-<ul>
-<li><a href="#start">エディションの選び方</a></li>
-<li><a href="#workflow">計算の進め方</a></li>
-<li><a href="#settings">設定項目の見方</a></li>
-<li><a href="#results">計算結果の活用</a></li>
-<li><a href="#data">データの保存・復元</a></li>
-<li><a href="#faq">よくある質問</a></li>
-</ul>
-</div>
-
-<h2 id="start">1. 通常版とSpace Age版を選ぶ</h2>
-<div class="panel">
-<h3>通常版</h3>
-<p>Factorio本編のレシピで計算するときに選びます。</p>
-<h3>Space Age版</h3>
-<p>Space Age拡張のレシピを使うときに選びます。通常版とは別の計算画面・レシピとして扱います。</p>
-</div>
-<p>トップページで使用するエディションを選択してください。迷った場合は、プレイ中のゲーム環境に合わせて選びます。</p>
-
-<h2 id="workflow">2. 基本的な計算の流れ</h2>
-<ol>
-<li>計算機を開き、通常版またはSpace Age版を選びます。</li>
-<li>作りたいアイテムやレシピを選択します。</li>
-<li>目標とする生産レートを入力します。</li>
-<li>必要に応じて設備、モジュール、ビーコンなどの条件を設定します。</li>
-<li>表示された素材・設備の計算結果を確認し、設定を調整します。</li>
-</ol>
-<div class="panel">
-<p><strong>計算結果を見るときのポイント</strong></p>
-<p>結果は入力したレシピと設定条件を前提にした計算値です。ゲーム内の実際の稼働状況と比べるときは、設備の稼働率や使用モジュールなどの条件をそろえてください。</p>
-</div>
-
-<h2 id="settings">3. 設定できる主な項目</h2>
-<h3>生産レートと表示単位</h3>
-<p>生産量の目標値を設定し、分・秒・時間などの単位で確認できます。</p>
-<h3>設備</h3>
-<p>組立機や炉の種類など、使用する設備条件を選択できます。設備の種類によって計算結果が変わります。</p>
-<h3>モジュール・ビーコン</h3>
-<p>速度・生産力・効率モジュールやビーコンに関する設定を調整できます。実際の工場で使う構成に合わせて入力してください。</p>
-<h3>ベルトと稼働率</h3>
-<p>ベルトの種類や設備の稼働率など、計算に関係する条件を設定できます。</p>
-
-<h2 id="results">4. 計算結果の活用</h2>
-<div class="panel">
-<h3>素材の必要量を確認する</h3>
-<p>目標の生産レートを変えると、必要になる素材量も変わります。まずは最終的に作りたいアイテムの量を決め、素材側の必要量を確認します。</p>
-<h3>設備数を工場の規模に合わせる</h3>
-<p>計算された設備数を目安に、設置スペースや電力、搬送方法を考えます。端数が出る場合は、実際の工場で用意できる台数に合わせて余裕を持たせてください。</p>
-<h3>条件を一つずつ変えて比較する</h3>
-<p>設備・モジュール・ビーコン・稼働率などを一度に変更せず、項目ごとに調整すると、どの条件が結果に影響したか把握しやすくなります。</p>
-</div>
-<p class="note">計算結果は入力条件に基づく理論値です。搬送詰まり、材料不足、電力不足、設備の停止など、ゲーム内の実稼働による差は別途確認してください。</p>
-
-<h2 id="data">5. レシピデータの管理</h2>
-<p>計算機にはレシピデータの読み込みやカスタムレシピの編集に関する機能があります。また、設定やレシピを含むバックアップを保存し、あとから復元できます。</p>
-<ul>
-<li>データを読み込む場合は、計算機が案内する対応形式のファイルを使用してください。</li>
-<li>バックアップを保存したら、ファイル名や保存場所を確認してください。</li>
-<li>復元する前に、現在のデータも必要に応じてバックアップしてください。</li>
-</ul>
-
-<h2 id="faq">6. よくある質問</h2>
-<h3>通常版でSpace Ageのレシピは使えますか？</h3>
-<p>通常版とSpace Age版は分けてあります。使用するゲーム環境に対応した方を選択してください。</p>
-<h3>設定やバックアップは通常版とSpace Age版で共通ですか？</h3>
-<p>2つのエディションは別々の計算画面・レシピとして扱います。データを読み込んだり復元したりするときは、対象のエディションとデータの内容を確認してから操作してください。</p>
-<h3>計算結果がゲーム内と合いません。</h3>
-<p>生産レートの単位、設備の種類、モジュール、ビーコン、稼働率などの設定が実際の工場と一致しているか確認してください。レシピデータが異なる場合も結果に差が出ます。</p>
-<h3>スマートフォンやタブレットでも使えますか？</h3>
-<p>ブラウザから利用できます。画面幅によって表示が変わるため、必要に応じて横向き表示も試してください。</p>
-<h3>このツールは公式ですか？</h3>
-<p>いいえ。Factorio向けの非公式ファンメイドツールです。Wube Softwareとは提携・承認関係にありません。ゲームおよび関連コンテンツの権利は各権利者に帰属します。</p>
-
-<div class="panel">
-<strong>おすすめの使い方</strong>
-<p>最初は目標生産量だけを決めて計算し、その後に設備やモジュールなどを実際の工場構成に近づけていくと、設定の違いによる変化を確認しやすくなります。</p>
-<a class="cta" href="calculator.html">計算機で試してみる</a>
-</div>
-<h2>関連ページ</h2>
-<ul>
-<li><a href="index.html">Factorio生産計算機トップページ</a></li>
-<li><a href="calculator.html">生産計算機を開く</a></li>
-</ul>
-</main>
+<div class="kicker">GUIDE &amp; FAQ</div><h1>使い方・よくある質問</h1><p class="lead">生産目標の設定から設備数の確認まで、基本的な使い方をまとめています。</p>
+<div class="layout">
+<aside class="toc"><strong>目次</strong><div class="toc-links"><a href="#start">基本的な使い方</a><a href="#normal">通常版</a><a href="#space">Space Age版</a><a href="#machines">設備・モジュール</a><a href="#reading">計算結果の見方</a><a href="#faq">よくある質問</a></div></aside>
+<div class="content">
+<section id="start"><h2>基本的な使い方</h2><ol><li>ホームから「通常版」または「Space Age」を選びます。</li><li>作りたいアイテム・レシピを選択します。</li><li>目標とする生産量と時間単位を設定します。</li><li>必要な素材、製造設備、投入量などの計算結果を確認します。</li><li>複数の製品を作る場合は、必要に応じて項目を追加して全体の生産量を調整します。</li></ol><div class="note">ゲーム内の設定や選択したレシピによって結果は変わります。実際の工場に合わせて設備や素材の供給量を調整してください。</div></section>
+<section id="normal"><h2>通常版について</h2><p>Factorio本編向けの計算モードです。通常版のレシピと素材を使って、生産に必要な設備数や素材の流れを確認します。</p><ul><li>本編で利用するレシピを選択します。</li><li>目標生産量を入力し、必要な素材と設備を確認します。</li><li>Space Age専用の惑星・宇宙関連レシピは通常版には含めません。</li></ul></section>
+<section id="space"><h2>Space Age版について</h2><p>Space Age拡張を導入した環境向けの計算モードです。通常版のレシピに加え、拡張で追加される生産要素を扱います。</p><ul><li>Space Ageで追加されるレシピや生産条件を選択します。</li><li>惑星ごとの生産条件が表示される場合は、実際に生産する環境に合わせます。</li><li>通常版とSpace Age版は別々の計算モードとして扱います。</li></ul><div class="note">Space Age版の結果を通常版の工場計画にそのまま流用しないでください。レシピや生産条件が異なる場合があります。</div></section>
+<section id="machines"><h2>設備・モジュール</h2><h3>製造設備</h3><p>設備の種類や速度によって、必要な台数は変わります。計算結果の設備数は目安として確認し、設置スペースや搬送量も考慮してください。</p><h3>モジュール・ビーコン</h3><p>モジュールやビーコンの設定に対応する項目がある場合は、ゲーム内で使用する構成と同じ条件を指定してください。設定を変更したあとは、必要設備数と素材消費量を再確認します。</p><h3>端数の扱い</h3><p>設備数に小数が表示される場合、必要な生産能力を示しています。実際に設置する台数は、通常は端数を切り上げて考えます。</p></section>
+<section id="reading"><h2>計算結果の見方</h2><ul><li><strong>目標生産量：</strong>指定した時間あたりに作りたいアイテム数です。</li><li><strong>必要素材：</strong>目標を達成するために消費する素材の量です。</li><li><strong>設備数：</strong>指定条件で必要となる製造設備の能力・台数の目安です。</li><li><strong>生産速度：</strong>設備やレシピの条件を反映した生産ペースです。</li></ul><p>単位（秒・分など）が異なる数値を比較するときは、同じ時間単位にそろえてください。</p></section>
+<section id="faq"><h2>よくある質問</h2>
+<details class="faq"><summary>通常版とSpace Age版は何が違いますか？</summary><p>通常版はFactorio本編向け、Space Age版は拡張で追加されるレシピや生産条件も扱うモードです。使用するゲーム環境に合わせて選んでください。</p></details>
+<details class="faq"><summary>通常版にSpace Age専用レシピは表示されますか？</summary><p>表示しない構成です。通常版とSpace Age版は分けて利用してください。</p></details>
+<details class="faq"><summary>設備数が小数になるのはなぜですか？</summary><p>必要な生産能力を設備台数に換算しているためです。実際に設置するときは端数を切り上げるなど、工場の構成に合わせて調整してください。</p></details>
+<details class="faq"><summary>ゲーム内の数値と少し違うのはなぜですか？</summary><p>レシピ、設備、モジュール、ビーコン、研究状況、ゲームバージョンなどの条件が一致していない可能性があります。計算条件を確認してください。</p></details>
+<details class="faq"><summary>スマートフォンやタブレットでも使えますか？</summary><p>スマートフォンやタブレットのブラウザから利用できます。画面幅によって表示が変わる場合は、横向き表示もお試しください。</p></details>
+<details class="faq"><summary>計算結果がおかしい・不具合を見つけました。</summary><p>使用したエディション、選択したアイテム、入力した生産量、発生した現象を控えておくと、原因を確認しやすくなります。</p></details>
+</section>
+<div class="actions"><a class="action" href="index.html">ホームに戻る</a><a class="action" href="calculator.html">計算機を開く</a></div>
+</div></div></main>
 <footer><div class="wrap">Factorio Production Calculator · Unofficial fan-made tool</div></footer>
-</body>
-</html>
+</body></html>
