@@ -31,12 +31,12 @@ h1{font-size:clamp(27px,4vw,36px);line-height:1.25;letter-spacing:-.02em;margin:
 .edition h2{font-size:17px;font-weight:650;margin:0 0 3px}
 .edition p{font-size:12px;color:var(--muted);margin:0}
 .arrow{color:var(--accent);font-size:20px;flex:none}
-.info{margin-top:48px;padding-top:22px;border-top:1px solid var(--border)}
+.feedback{margin-top:26px;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:5px;display:flex;align-items:center;justify-content:space-between;gap:16px}.feedback h2{font-size:15px;margin:0 0 4px}.feedback p{font-size:12px;color:var(--muted);margin:0}.feedback-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;background:var(--accent);color:#171a1d;border-radius:4px;font-size:13px;font-weight:700;white-space:nowrap}.feedback-link:hover{background:var(--accent-hover)}.info{margin-top:48px;padding-top:22px;border-top:1px solid var(--border)}
 .info h2{font-size:14px;margin:0 0 8px;font-weight:650}
 .info p{font-size:12px;color:var(--muted);margin:0;max-width:720px}
 footer{border-top:1px solid var(--border);padding:18px 0;color:#858d92;font-size:11px}
 .footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
-@media(max-width:600px){.wrap{width:calc(100% - 30px)}header{height:56px}.logo{font-size:12px}nav{gap:13px;font-size:11px}main{padding:42px 0 58px}.editions{grid-template-columns:1fr}.edition{padding:17px}.info{margin-top:38px}}
+@media(max-width:600px){.feedback{align-items:flex-start;flex-direction:column}.feedback-link{width:100%}.wrap{width:calc(100% - 30px)}header{height:56px}.logo{font-size:12px}nav{gap:13px;font-size:11px}main{padding:42px 0 58px}.editions{grid-template-columns:1fr}.edition{padding:17px}.info{margin-top:38px}}
 </style>
 </head>
 <body>
@@ -54,6 +54,7 @@ footer{border-top:1px solid var(--border);padding:18px 0;color:#858d92;font-size
 <a class="edition" href="calculator.html#space" data-edition="space"><div><h2>Space Age</h2><p>拡張版</p></div><span class="arrow">›</span></a>
 </div>
 </section>
+<section class="feedback" aria-label="ご意見・不具合報告"><div><h2>ご意見・不具合報告</h2><p>改善案や不具合など、お気軽にお知らせください。</p></div><a class="feedback-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeicCFZg_ION3U-59g-nzDuyC6cvGMyNp0Dn84MS3tAoDEKsQ/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">フォームを開く ↗</a></section>
 <section class="info" id="about">
 <h2>このサイトについて</h2>
 <p>Factorio向けの非公式ファンメイドツールです。Factorioおよび関連コンテンツの権利は各権利者に帰属します。Wube Softwareとは提携・承認関係にありません。</p>
