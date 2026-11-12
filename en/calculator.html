@@ -1176,27 +1176,28 @@ button{font-weight:600}
     $("rawChart").innerHTML = renderBars(totals.raw, true);
 
     function renderBranch(name, needPerMin, path = [], isTarget = false, depth = 0) {
-      if (depth > 60) return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine error">依存関係が深すぎるため表示を省略しました</div></div>`;
+      const en = value => value === "フルオロケトン（低温）" ? "Fluoroketone (Cold)" : (window.__enTranslate ? window.__enTranslate(value) : value);
+      if (depth > 60) return `<div class="tree-item"><b>${escapeHtml(en(name))}</b><div class="tree-machine error">Dependency chain is too deep to display.</div></div>`;
       const rec = state.recipes.find(x => x.name === name);
       const qty = displayRate(needPerMin);
       if (!rec || RAW_NAMES.has(name)) {
-        return `<div class="tree-item raw-item"><div class="tree-head"><b>🟢 ${escapeHtml(name)}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine">必要素材</div></div>`;
+        return `<div class="tree-item raw-item"><div class="tree-head"><b>🟢 ${escapeHtml(en(name))}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine">Raw Material</div></div>`;
       }
-      if (path.includes(name)) return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine error">循環レシピ</div></div>`;
-      if (rec.cat === "fluidcraft" && $("assembler").value === "1") return `<div class="tree-item"><b>${escapeHtml(name)}</b><div class="tree-machine warn">組立機1では製造できません</div></div>`;
+      if (path.includes(name)) return `<div class="tree-item"><b>${escapeHtml(en(name))}</b><div class="tree-machine error">Circular recipe dependency</div></div>`;
+      if (rec.cat === "fluidcraft" && $("assembler").value === "1") return `<div class="tree-item"><b>${escapeHtml(en(name))}</b><div class="tree-machine warn">Cannot be crafted with Assembling Machine 1.</div></div>`;
 
       const moduleFx = moduleEffectsFor(rec);
       const effectiveProd = machineBaseProductivity(rec.cat) + (canApplyProductivity(rec) ? researchProd + moduleFx.productivity : 0);
       const crafts = needPerMin / (expectedRecipeOutput(rec, rec.mainProduct || rec.name) * (1 + effectiveProd));
       const count = crafts / (60 * selectedSpeed(rec.cat) * (1 + researchSpeed + moduleFx.speed) / rec.time * uptime);
       const child = Object.entries(rec.in || {}).map(([ingredient, amount]) => renderBranch(ingredient, crafts * amount, [...path, name], false, depth + 1)).join("");
-      const byproductText = Object.entries(recipeSideProducts(rec)).map(([product, amount]) => `${escapeHtml(product)} ${fmtExpected(crafts * amount)} ${escapeHtml(unitTxt)}（期待値・相殺前）`).join(", ");
+      const byproductText = Object.entries(recipeSideProducts(rec)).map(([product, amount]) => `${escapeHtml(en(product))} ${fmtExpected(crafts * amount)} ${escapeHtml(unitTxt)} (expected; before netting)`).join(", ");
 
-      return `<div class="tree-item ${isTarget ? "final-item" : ""}"><div class="tree-head"><b>${isTarget ? "🟠 " : ""}${escapeHtml(name)}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine"><span class="tree-label">必要設備</span>${escapeHtml(machineInfo(rec.cat).name)} ${fmt(count)} 台（実機 ${Math.ceil(count - 1e-9)} 台）${rec.planet ? `<div class="note">生産惑星 : ${escapeHtml(rec.planet)}${rec.surface ? ` / Surface Conditions:${escapeHtml(rec.surface)}` : ""}</div>` : ""}${byproductText ? `<div class="note">副産物 : ${byproductText}</div>` : ""}</div>${child ? `<div class="tree-branch">${child}</div>` : ""}</div>`;
+      return `<div class="tree-item ${isTarget ? "final-item" : ""}"><div class="tree-head"><b>${isTarget ? "🟠 " : ""}${escapeHtml(en(name))}</b><span class="tree-qty">${fmt(qty)} ${escapeHtml(unitTxt)}</span></div><div class="tree-machine"><span class="tree-label">Required Machines</span>${escapeHtml(en(machineInfo(rec.cat).name))} ${fmt(count)} machines (${Math.ceil(count - 1e-9)} actual)${byproductText ? `<div class="note">By-products: ${byproductText}</div>` : ""}</div>${child ? `<div class="tree-branch">${child}</div>` : ""}</div>`;
     }
 
-    $("tree").innerHTML = `<div class="tree-legend"><span><i class="legend-dot final"></i>目標アイテム</span><span><i class="legend-dot"></i>中間素材</span><span><i class="legend-dot raw"></i>原材料</span></div>` +
-      targets.map(t => `<div class="tree-root"><div class="tree-root-title"><strong>完成品 : ${escapeHtml(t.name)}</strong><span class="tree-qty">${fmt(displayRate(t.rate))} ${escapeHtml(unitTxt)}</span></div><div class="tree-branch">${renderBranch(t.name, t.rate, [], true)}</div></div>`).join("");
+    $("tree").innerHTML = `<div class="tree-legend"><span><i class="legend-dot final"></i>Target Item</span><span><i class="legend-dot"></i>Intermediate Materials</span><span><i class="legend-dot raw"></i>Raw Materials</span></div>` +
+      targets.map(t => `<div class="tree-root"><div class="tree-root-title"><strong>Finished Product: ${escapeHtml(window.__enTranslate ? window.__enTranslate(t.name) : t.name)}</strong><span class="tree-qty">${fmt(displayRate(t.rate))} ${escapeHtml(unitTxt)}</span></div><div class="tree-branch">${renderBranch(t.name, t.rate, [], true)}</div></div>`).join("");
 
     if (totals.errors.length) {
       setStatusMessage("計算上の注意・問題 : " + [...new Set(totals.errors)].join(" / "), "error");
