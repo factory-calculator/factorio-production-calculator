@@ -9,4 +9,10 @@
   <url><loc>https://factory-calculator.github.io/factorio-production-calculator/en/updates.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://factory-calculator.github.io/factorio-production-calculator/en/calculator.html</loc><changefreq>monthly</changefreq></url>
   <url><loc>https://factory-calculator.github.io/factorio-production-calculator/en/calculator-space-age.html</loc><changefreq>monthly</changefreq></url>
+
+  <url><loc>https://factory-calculator.github.io/factorio-production-calculator/zh-CN/</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://factory-calculator.github.io/factorio-production-calculator/zh-CN/guide.html</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://factory-calculator.github.io/factorio-production-calculator/zh-CN/updates.html</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://factory-calculator.github.io/factorio-production-calculator/zh-CN/calculator.html</loc><changefreq>monthly</changefreq></url>
+  <url><loc>https://factory-calculator.github.io/factorio-production-calculator/zh-CN/calculator-space-age.html</loc><changefreq>monthly</changefreq></url>
 </urlset>
