@@ -214,7 +214,7 @@ button{font-weight:600}
     <option value="建築">Structures & Power</option>
     <option value="科学">Science & Research</option>
     <option value="化工">Chemistry & Fluids</option>
-    <option value="ロケット">Rocket Parts</option>
+    <option value="ロケット">火箭部件</option>
   </select>
   <select id="target" size="1" aria-label="要生产的物品"></select>
   <small id="matchCount" class="note">请选择物品</small>
@@ -227,10 +227,10 @@ button{font-weight:600}
   <span class="note">常用物品：</span>
   <button type="button" class="quickbtn" data-item="鉄板">鉄板</button>
   <button type="button" class="quickbtn" data-item="銅板">銅板</button>
-  <button type="button" class="quickbtn" data-item="鉄の歯車">鉄の歯車</button>
+  <button type="button" class="quickbtn" data-item="鉄の歯車">铁齿轮</button>
   <button type="button" class="quickbtn" data-item="電子基板">電子基板</button>
   <button type="button" class="quickbtn" data-item="発展基板">発展基板</button>
-  <button type="button" class="quickbtn" data-item="自動化サイエンスパック">自動化サイエンス</button>
+  <button type="button" class="quickbtn" data-item="自動化サイエンスパック">自动化科技包</button>
 </div>
 <div class="actions"><button id="calc" type="button">计算生产线</button><button type="button" class="secondary" id="reset">恢复默认设置</button></div>
 <div class="admin-section" style="margin-top:14px">
@@ -251,12 +251,12 @@ button{font-weight:600}
 </div>
 <h3 style="margin-top:16px">插件与插件塔设置</h3>
 <div class="settings-grid module-grid">
-<label>插件等级<select id="moduleTier"><option value="1">モジュール1</option><option value="2">モジュール2</option><option value="3" selected>モジュール3</option></select></label>
+<label>插件等级<select id="moduleTier"><option value="1">插件 1</option><option value="2">插件 2</option><option value="3" selected>插件 3</option></select></label>
 <label>机器速度插件数量<input id="machineSpeedModules" type="number" min="0" max="8" step="1" value="0"></label>
 <label>机器产能插件数量<input id="machineProdModules" type="number" min="0" max="8" step="1" value="0"></label>
 <label>机器节能插件数量<input id="machineEfficiencyModules" type="number" min="0" max="8" step="1" value="0"></label>
 <label>每台机器对应的插件塔数量<input id="beaconsPerMachine" type="number" min="0" max="20" step="1" value="0"></label>
-<label>插件塔插件类型<select id="beaconModuleType"><option value="speed">速度モジュール</option><option value="efficiency">効率モジュール</option></select></label>
+<label>插件塔插件类型<select id="beaconModuleType"><option value="speed">速度插件</option><option value="efficiency">节能插件</option></select></label>
 <label>每座插件塔的插件数量<input id="beaconModuleCount" type="number" min="0" max="2" step="1" value="2"></label>
 </div>
 <p class="note">The same module configuration is assumed for every machine. Modules exceeding a machine’s slot limit are automatically disabled. The built-in +50% productivity bonus of Foundries, Electromagnetic Plants, and Biochambers is included. Beacon transmission efficiency uses the Factorio 2.0 standard-quality formula (1.5 × √number of beacons). Probabilistic outputs use expected averages, so actual short-term production may differ. By-products are displayed but are not automatically deducted from other production steps. Biochamber nutrient fuel is estimated separately.</p>
@@ -265,7 +265,7 @@ button{font-weight:600}
 <section class="panel">
 <h2>計算結果</h2>
 <!-- 改善点: アラートバナーとして分かりやすく表示 -->
-<div id="status" class="status-banner info" aria-live="polite">アイテムと目標数量を選んで「计算生产线」を押してください。</div>
+<div id="status" class="status-banner info" aria-live="polite">请选择物品并设置目标数量，然后点击“计算生产线”。</div>
 
 <div class="stats">
 <div class="stat"><small>目標生産量</small><strong id="outTarget">—</strong></div>
@@ -305,9 +305,9 @@ button{font-weight:600}
 </div>
 <div id="catalogPage" class="page hidden"><section class="panel" id="supportedItemsPanel">
   <h2>対応物品目录</h2>
-  <p class="note">現在読み込まれているレシピデータをもとに、完成品として選択できるアイテムと、材料としてのみ使われるアイテムを一覧表示します。レシピが登録されていない素材は完成品の生产计算対象にはなりません。</p>
+  <p class="note">根据当前加载的配方数据，列出可作为成品选择的物品，以及仅用作原材料的物品。未注册配方的原材料无法作为成品进行生产计算。</p>
   <div class="catalog-toolbar">
-    <input id="supportedItemSearch" type="search" placeholder="搜索物品名称或原材料" autocomplete="off" aria-label="対応アイテムを検索">
+    <input id="supportedItemSearch" type="search" placeholder="搜索物品名称或原材料" autocomplete="off" aria-label="搜索支持的物品">
     <select id="supportedItemCategory" aria-label="按类别筛选">
       <option value="all">All Categories</option>
       <option value="素材">Materials & Intermediates</option>
@@ -316,7 +316,7 @@ button{font-weight:600}
       <option value="建築">Structures & Power</option>
       <option value="科学">Science & Research</option>
       <option value="化工">Chemistry & Fluids</option>
-      <option value="ロケット">Rocket Parts</option>
+      <option value="ロケット">火箭部件</option>
         <option value="raw">Raw Materials Only (No Recipe)</option>
     </select>
   </div>
@@ -327,7 +327,7 @@ button{font-weight:600}
   <div class="catalog-wrap">
     <table id="supportedItemsTable">
       <thead><tr><th>Item</th><th>Type</th><th>Recipe & Required Ingredients</th></tr></thead>
-      <tbody id="supportedItemsBody"><tr><td colspan="3" class="note">物品目录を読み込んでいます。</td></tr></tbody>
+      <tbody id="supportedItemsBody"><tr><td colspan="3" class="note">正在加载物品列表。</td></tr></tbody>
     </table>
   </div>
 </section>
@@ -374,7 +374,7 @@ button{font-weight:600}
           <label>配方 ID<input id="editRecipeId" placeholder="custom-recipe"></label>
           <label>配方名称<input id="editRecipeName" placeholder="配方名称"></label>
           <div class="controls">
-            <label>类别<select id="editRecipeCat"><option value="craft">组装</option><option value="fluidcraft">流体対応组装</option><option value="smelt">冶炼</option><option value="chem">化工</option><option value="advanced">高度な组装</option><option value="rocket">ロケット</option></select></label>
+            <label>类别<select id="editRecipeCat"><option value="craft">组装</option><option value="fluidcraft">流体组装</option><option value="smelt">冶炼</option><option value="chem">化工</option><option value="advanced">高级组装</option><option value="rocket">火箭</option></select></label>
             <label>製造時間（秒）<input id="editRecipeTime" type="number" min="0.01" step="any" value="1"></label>
             <label>生産個数<input id="editRecipeOut" type="number" min="0.01" step="any" value="1"></label>
           </div>
@@ -387,19 +387,19 @@ button{font-weight:600}
       <div class="admin-section">
         <h3>配方主数据管理</h3>
         <p class="note">可以导入 Factorio data.raw 格式的配方 JSON。支持单一确定产物；不支持的配方将被排除，并报告处理数量。</p>
-        <label>現在のデータセット名<input id="datasetLabel" value="同梱データ（通常版レシピ）"></label>
-        <div class="actions" style="margin-top:8px"><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">Factorio data.raw JSONを取り込む<input id="importFactorioData" type="file" accept=".json,application/json" style="display:none"></label></div>
+        <label>現在のデータセット名<input id="datasetLabel" value="内置数据（标准版配方）"></label>
+        <div class="actions" style="margin-top:8px"><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">导入 Factorio data.raw JSON<input id="importFactorioData" type="file" accept=".json,application/json" style="display:none"></label></div>
         <p id="factorioImportMsg" class="note" aria-live="polite"></p>
         <div class="actions" style="margin-bottom: 12px; margin-top:12px;">
-          <button type="button" class="secondary" id="export">JSONエクスポート</button>
+          <button type="button" class="secondary" id="export">导出 JSON</button>
           <label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">
-            JSONインポート <input id="import" type="file" accept=".json,application/json" style="display:none">
+            导入 JSON <input id="import" type="file" accept=".json,application/json" style="display:none">
           </label>
-          <button type="button" class="secondary" id="saveStorageBtn">ブラウザに保存</button><button type="button" class="secondary" id="backupAllBtn">全設定バックアップ</button><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">全設定復元<input id="restoreAllInput" type="file" accept=".json,application/json" style="display:none"></label>
-          <button type="button" class="danger" id="resetStorageBtn">デフォルトに戻す</button>
+          <button type="button" class="secondary" id="saveStorageBtn">保存到浏览器</button><button type="button" class="secondary" id="backupAllBtn">备份全部设置</button><label class="secondary" style="display:inline-flex;align-items:center;padding:8px 12px;border-radius:8px;cursor:pointer">恢复全部设置<input id="restoreAllInput" type="file" accept=".json,application/json" style="display:none"></label>
+          <button type="button" class="danger" id="resetStorageBtn">恢复默认设置</button>
         </div>
-        <textarea id="recipeJsonEditor" rows="6" style="width:100%; font-family: monospace; font-size: 12px;" placeholder="JSONデータ"></textarea>
-        <div style="margin-top: 8px;"><button type="button" id="applyJsonTextBtn">テキストから直に反映</button></div>
+        <textarea id="recipeJsonEditor" rows="6" style="width:100%; font-family: monospace; font-size: 12px;" placeholder="JSON 数据"></textarea>
+        <div style="margin-top: 8px;"><button type="button" id="applyJsonTextBtn">直接应用文本内容</button></div>
       </div>
     </div>
 
