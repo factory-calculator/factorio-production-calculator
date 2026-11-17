@@ -3,10 +3,10 @@
   const path = window.location.pathname;
   const locale = path.startsWith("/en/") ? "en" : path.startsWith("/zh-CN/") ? "zh-CN" : "ja";
   let page = "home";
-  if (/calculator-space-age\\.html$/.test(path)) page = "space";
-  else if (/calculator\\.html$/.test(path)) page = "calculator";
-  else if (/guide\\.html$/.test(path)) page = "guide";
-  else if (/updates\\.html$/.test(path)) page = "updates";
+  if (/calculator-space-age\.html$/.test(path)) page = "space";
+  else if (/calculator\.html$/.test(path)) page = "calculator";
+  else if (/guide\.html$/.test(path)) page = "guide";
+  else if (/updates\.html$/.test(path)) page = "updates";
   if (locale === "ja" && page === "calculator" &&
       document.querySelector('button.tab[data-page="space"][aria-selected="true"]')) page = "space";
 
