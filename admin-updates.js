@@ -47,7 +47,7 @@ function prepareTranslations(){
 }
 async function save(published){
  if(!valid())return;
- if(!translations&&!prepareTranslations())return;
+ if(!prepareTranslations())return;
  const p=pack();translations.en.date=p.date;translations.zh.date=p.date;
  const record={ja:p,en:translations.en,zh:translations.zh,published,updated_at:new Date().toISOString()};
  const id=$("recordId").value;
