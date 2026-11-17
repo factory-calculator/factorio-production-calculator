@@ -22,8 +22,8 @@
   let page = "home";
   if (/^(?:en\/)?calculator-space-age\.html$/.test(cleanPath)) page = "space";
   else if (/^(?:en\/|zh-CN\/)?calculator\.html$/.test(cleanPath)) page = "calculator";
-  else if (/^(?:en\/)?guide\.html$/.test(cleanPath)) page = "guide";
-  else if (/^(?:en\/)?updates\.html$/.test(cleanPath)) page = "updates";
+  else if (/^(?:en\/|zh-CN\/)?guide\.html$/.test(cleanPath)) page = "guide";
+  else if (/^(?:en\/|zh-CN\/)?updates\.html$/.test(cleanPath)) page = "updates";
 
   // The Japanese calculator uses tabs for both editions on one page.
   if (locale === "ja" && page === "calculator" &&
@@ -51,13 +51,14 @@
       home: basePath + "zh-CN/",
       calculator: basePath + "zh-CN/calculator.html",
       space: basePath + "zh-CN/calculator-space-age.html",
-      guide: basePath + "zh-CN/",
-      updates: basePath + "zh-CN/"
+      guide: basePath + "zh-CN/guide.html",
+      updates: basePath + "zh-CN/updates.html"
     }
   };
 
   const names = { ja: "日本語", en: "English", "zh-CN": "简体中文" };
-  const host = document.querySelector("header .nav") ||
+  const host = document.querySelector(".site-topbar") ||
+    document.querySelector("header .nav") ||
     document.querySelector("header") || document.body;
   if (!host || document.querySelector(".site-language-picker")) return;
 
