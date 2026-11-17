@@ -1697,7 +1697,7 @@ button{font-weight:600}
    }
    root.childNodes.forEach(walk);
  };
- fetch("../i18n/zh-CN.json").then(r=>r.ok?r.json():Promise.reject(new Error("locale unavailable"))).then(data=>Object.assign(translations,data.translations||{})).catch(()=>{}).finally(()=>{
+ fetch("../i18n/zh-CN.json?v=20261117").then(r=>r.ok?r.json():Promise.reject(new Error("locale unavailable"))).then(data=>Object.assign(translations,data.translations||{})).catch(()=>{}).finally(()=>{
    document.documentElement.lang="zh-CN";
    walk(document.body);
    new MutationObserver(records=>records.forEach(record=>{
