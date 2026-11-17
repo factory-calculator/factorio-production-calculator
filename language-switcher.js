@@ -13,9 +13,9 @@
     : path.replace(/^\/+/, "");
   const cleanPath = relativePath.replace(/\/+$/, "");
 
-  const locale = cleanPath.startsWith("en/")
+  const locale = (cleanPath === "en" || cleanPath.startsWith("en/"))
     ? "en"
-    : cleanPath.startsWith("zh-CN/")
+    : (cleanPath === "zh-CN" || cleanPath.startsWith("zh-CN/"))
       ? "zh-CN"
       : "ja";
 
