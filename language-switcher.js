@@ -1,32 +1,77 @@
 (() => {
   "use strict";
+
+  // GitHub Pages project sites live below /<repository>/, not at the domain root.
+  // Derive the site base from this script's own URL so links work on every page.
+  const scriptUrl = document.currentScript && document.currentScript.src;
+  const basePath = scriptUrl
+    ? new URL(".", scriptUrl).pathname
+    : (window.location.pathname.match(/^\/(?:[^/]+)\//) || ["/"])[0];
   const path = window.location.pathname;
-  const locale = path.startsWith("/en/") ? "en" : path.startsWith("/zh-CN/") ? "zh-CN" : "ja";
+  const relativePath = path.startsWith(basePath)
+    ? path.slice(basePath.length)
+    : path.replace(/^\/+/, "");
+  const cleanPath = relativePath.replace(/\/+$/, "");
+
+  const locale = cleanPath.startsWith("en/")
+    ? "en"
+    : cleanPath.startsWith("zh-CN/")
+      ? "zh-CN"
+      : "ja";
+
   let page = "home";
-  if (/calculator-space-age\.html$/.test(path)) page = "space";
-  else if (/calculator\.html$/.test(path)) page = "calculator";
-  else if (/guide\.html$/.test(path)) page = "guide";
-  else if (/updates\.html$/.test(path)) page = "updates";
+  if (/^(?:en\/)?calculator-space-age\.html$/.test(cleanPath)) page = "space";
+  else if (/^(?:en\/|zh-CN\/)?calculator\.html$/.test(cleanPath)) page = "calculator";
+  else if (/^(?:en\/)?guide\.html$/.test(cleanPath)) page = "guide";
+  else if (/^(?:en\/)?updates\.html$/.test(cleanPath)) page = "updates";
+
+  // The Japanese calculator uses tabs for both editions on one page.
   if (locale === "ja" && page === "calculator" &&
-      document.querySelector('button.tab[data-page="space"][aria-selected="true"]')) page = "space";
+      (window.location.hash === "#space" ||
+       document.querySelector('button.tab[data-page="space"][aria-selected="true"]'))) {
+    page = "space";
+  }
 
   const destinations = {
-    ja: { home: "/", calculator: "/calculator.html", space: "/calculator.html#space", guide: "/guide.html", updates: "/updates.html" },
-    en: { home: "/en/", calculator: "/en/calculator.html", space: "/en/calculator-space-age.html", guide: "/en/guide.html", updates: "/en/updates.html" },
-    "zh-CN": { home: "/zh-CN/", calculator: "/zh-CN/calculator.html", space: "/zh-CN/calculator-space-age.html", guide: "/zh-CN/", updates: "/zh-CN/" }
+    ja: {
+      home: basePath,
+      calculator: basePath + "calculator.html",
+      space: basePath + "calculator.html#space",
+      guide: basePath + "guide.html",
+      updates: basePath + "updates.html"
+    },
+    en: {
+      home: basePath + "en/",
+      calculator: basePath + "en/calculator.html",
+      space: basePath + "en/calculator-space-age.html",
+      guide: basePath + "en/guide.html",
+      updates: basePath + "en/updates.html"
+    },
+    "zh-CN": {
+      home: basePath + "zh-CN/",
+      calculator: basePath + "zh-CN/calculator.html",
+      space: basePath + "zh-CN/calculator-space-age.html",
+      guide: basePath + "zh-CN/",
+      updates: basePath + "zh-CN/"
+    }
   };
+
   const names = { ja: "日本語", en: "English", "zh-CN": "简体中文" };
-  const host = document.querySelector("header .nav") || document.querySelector("header") || document.body;
+  const host = document.querySelector("header .nav") ||
+    document.querySelector("header") || document.body;
   if (!host || document.querySelector(".site-language-picker")) return;
 
   const wrapper = document.createElement("label");
   wrapper.className = "site-language-picker";
   wrapper.setAttribute("aria-label", "Language");
+
   const caption = document.createElement("span");
   caption.textContent = locale === "ja" ? "言語" : locale === "zh-CN" ? "语言" : "Language";
+
   const select = document.createElement("select");
   select.setAttribute("aria-label", "Select language");
   select.title = "Select language";
+
   for (const key of ["ja", "en", "zh-CN"]) {
     const option = document.createElement("option");
     option.value = key;
@@ -34,9 +79,12 @@
     option.selected = key === locale;
     select.appendChild(option);
   }
+
   select.addEventListener("change", () => {
-    window.location.href = destinations[select.value][page];
+    const destination = destinations[select.value][page] || destinations[select.value].home;
+    window.location.assign(destination);
   });
+
   wrapper.append(caption, select);
   host.appendChild(wrapper);
 
