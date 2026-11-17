@@ -413,6 +413,30 @@ button{font-weight:600}
 (() => {
   'use strict';
 
+  // Keep page navigation responsive even if a later calculator initializer fails.
+  document.addEventListener("click", event => {
+    const button = event.target.closest(".page-tab");
+    if (!button) return;
+    const pageId = button.dataset.page;
+    if (!["calculatorPage", "catalogPage"].includes(pageId)) return;
+    ["calculatorPage", "catalogPage"].forEach(id => {
+      const page = document.getElementById(id);
+      if (page) page.classList.toggle("hidden", id !== pageId);
+    });
+    document.querySelectorAll(".page-tab").forEach(tab => {
+      tab.classList.toggle("active", tab === button);
+    });
+    if (pageId === "catalogPage") {
+      try {
+        renderSupportedItems();
+      } catch (error) {
+        console.error("Item catalog rendering failed:", error);
+        const body = document.getElementById("supportedItemsBody");
+        if (body) body.innerHTML = '<tr><td colspan="3" class="note">目录暂时无法显示，请重新加载页面。</td></tr>';
+      }
+    }
+  }, true);
+
   const APP_EDITION = 'base';
   const RECIPE_STORAGE_KEY = `factorio_custom_recipes_${APP_EDITION}`;
   const RECIPE_VERSION_KEY = `factorio_recipe_data_version_${APP_EDITION}`;
@@ -1225,7 +1249,7 @@ button{font-weight:600}
     document.querySelectorAll(".page-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.page === pageId));
     if (pageId === "catalogPage") renderSupportedItems();
   }
-  document.querySelectorAll(".page-tab").forEach(btn => btn.addEventListener("click", () => showPage(btn.dataset.page)));
+  // Page-tab navigation is handled by the early delegated listener above.
   function showAnalysis(panelId) {
     document.querySelectorAll(".analysis-view").forEach(panel => panel.classList.toggle("hidden", panel.id !== panelId));
     document.querySelectorAll(".analysis-tab").forEach(btn => {
