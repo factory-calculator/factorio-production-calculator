@@ -4,7 +4,7 @@
   "source": "Factorio Crowdin XLIFF export",
   "sourceLanguage": "en",
   "fallbackLocale": "en",
-  "translationCount": 194,
+  "translationCount": 205,
   "totalUiAndItemKeys": 498,
   "note": "Initial import. Keys are the Japanese labels currently used by the calculator; unmatched strings should fall back to English until reviewed translations are added.",
   "translations": {
@@ -16,7 +16,7 @@
     "タングステンカーバイド": "碳化钨",
     "フルオロケトン（高温）": "氟酮（热）",
     "アステロイドコレクター": "星岩抓取臂",
-    "Space Age版": "太空时代",
+    "Space Age版": "太空时代版",
     "電動エンジンユニット": "电动机",
     "飛行ロボットフレーム": "机器人构架",
     "スタックインサーター": "堆叠机械臂",
@@ -201,6 +201,17 @@
     "bio": "生物室",
     "cryo": "低温工厂",
     " : ": "：",
-    "：": "："
+    "：": "：",
+    "カスタマイズ設定": "自定义设置",
+    "生産計算": "生产计算",
+    "アイテム一覧": "物品目录",
+    "通常版": "基础游戏版",
+    "生産目標": "生产目标",
+    "作りたいアイテム": "目标物品",
+    "目標生産量": "目标产量",
+    "組立機": "组装机",
+    "精錬炉": "熔炉",
+    "生産ラインを計算": "计算生产线",
+    "初期設定に戻す": "恢复默认设置"
   }
 }
