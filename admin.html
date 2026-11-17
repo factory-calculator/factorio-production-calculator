@@ -2,7 +2,7 @@
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#14191d"><title>管理者ページ｜Factorio Production Calculator</title>
 <style>
 :root{color-scheme:dark;--bg:#121619;--surface:#1b2226;--line:#354149;--text:#edf1f2;--muted:#a4afb5;--accent:#df913d}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;line-height:1.6}.wrap{width:min(900px,calc(100% - 30px));margin:auto}header{padding:20px 0;border-bottom:1px solid var(--line)}h1{font-size:25px;margin:0}main{padding:26px 0 60px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin:0 0 18px}label{display:block;font-size:13px;color:var(--muted);margin:12px 0 5px}input,textarea{width:100%;padding:11px;border:1px solid #46545c;border-radius:7px;background:#101619;color:var(--text);font:inherit}textarea{min-height:130px;resize:vertical}button,.link{display:inline-block;border:0;border-radius:7px;padding:10px 15px;background:#a96525;color:white;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;margin:8px 6px 0 0}button.secondary{background:#46545c}button.danger{background:#8b3e3e}.muted{color:var(--muted);font-size:13px}.status{min-height:22px;color:#f0bd7e;font-size:13px}.entry{border-top:1px solid var(--line);padding:12px 0}.entry strong{display:block}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}.hidden{display:none!important}small{color:var(--muted)}</style></head>
-<body><header><div class="wrap"><h1>更新履歴 管理者ページ</h1><div class="muted">日本語で入力すると英語・中国語に自動翻訳します。</div></div></header>
+<body><header><div class="wrap"><h1>更新履歴 管理者ページ</h1><div class="muted">日本語の内容をChatGPTで翻訳し、英語・中国語の欄に貼り付けて保存します。</div></div></header>
 <main class="wrap">
 <section id="loginPanel" class="panel"><h2>管理者ログイン</h2><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="username"><label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password"><button id="loginBtn">ログイン</button><p id="loginStatus" class="status"></p></section>
 <section id="manager" class="hidden">
@@ -11,7 +11,15 @@
 <label for="title">タイトル（日本語）</label><input id="title" maxlength="160" placeholder="例：管理者向け更新管理機能を追加">
 <div class="row"><div><label for="date">日付</label><input id="date" type="date"></div><div><label for="category">カテゴリ</label><input id="category" maxlength="60" placeholder="例：ADMIN / UPDATE"></div></div>
 <label for="items">更新内容（1行につき1項目）</label><textarea id="items" placeholder="管理者ページから更新履歴を編集できるようにしました。&#10;英語・中国語へ自動翻訳できるようにしました。"></textarea>
-<button id="translateBtn">翻訳してプレビュー</button><button id="publishBtn">公開して3言語に反映</button><button id="draftBtn" class="secondary">下書き保存</button><button id="clearBtn" class="secondary">入力をクリア</button>
+<h3>英語（ChatGPTで翻訳した内容を入力）</h3>
+<label for="enTitle">Title</label><input id="enTitle" maxlength="160" placeholder="English title">
+<label for="enCategory">Category</label><input id="enCategory" maxlength="60" placeholder="e.g. UPDATE">
+<label for="enItems">Update details（1行につき1項目）</label><textarea id="enItems" placeholder="English update details"></textarea>
+<h3>中国語（簡体字）</h3>
+<label for="zhTitle">标题</label><input id="zhTitle" maxlength="160" placeholder="中文标题">
+<label for="zhCategory">分类</label><input id="zhCategory" maxlength="60" placeholder="例如：更新">
+<label for="zhItems">更新内容（每行一项）</label><textarea id="zhItems" placeholder="中文更新内容"></textarea>
+<button id="translateBtn">3言語を確認</button><button id="publishBtn">公開して3言語に反映</button><button id="draftBtn" class="secondary">下書き保存</button><button id="clearBtn" class="secondary">入力をクリア</button>
 <div id="status" class="status" aria-live="polite"></div><div id="preview" class="muted"></div>
 </div>
 <div class="panel"><h2>登録済みの更新履歴</h2><div id="entries" class="muted">読み込み中…</div></div>
