@@ -34,20 +34,20 @@ async function loadEntries(){
   el.append(info,detail,document.createElement("br"),edit,toggle,del);$("entries").append(el);
  });
 }
-function editRow(row){$("recordId").value=row.id;$("formHeading").textContent="更新履歴を編集";$("title").value=row.ja?.title||"";$("date").value=row.ja?.date||today;$("category").value=row.ja?.category||"";$("items").value=(row.ja?.items||[]).join("\n");translations={en:row.en,zh:row.zh};$("preview").textContent="既存の翻訳を読み込みました。内容を変更した場合は再翻訳してください。";status("編集内容を読み込みました。");window.scrollTo({top:0,behavior:"smooth"});}
-async function translate(){
- if(!valid())return;
- status("英語・中国語に翻訳中…");
- const {data:{session}}=await db.auth.getSession();
- const {data,error}=await db.functions.invoke("translate-update",{body:{fields:pack()},headers:{Authorization:"Bearer "+session.access_token}});
- if(error||data?.error){status("翻訳できませんでした："+(data?.error||error?.message||"不明なエラー"),true);return;}
- translations={en:{...data.en,date:pack().date},zh:{...data.zh,date:pack().date}};
- $("preview").textContent="英語: "+translations.en.title+" / 中文: "+translations.zh.title;
- status("翻訳が完了しました。公開前に内容を確認してください。");
+function editRow(row){$("recordId").value=row.id;$("formHeading").textContent="更新履歴を編集";$("title").value=row.ja?.title||"";$("date").value=row.ja?.date||today;$("category").value=row.ja?.category||"";$("items").value=(row.ja?.items||[]).join("\n");$("enTitle").value=row.en?.title||"";$("enCategory").value=row.en?.category||"";$("enItems").value=(row.en?.items||[]).join("\n");$("zhTitle").value=row.zh?.title||"";$("zhCategory").value=row.zh?.category||"";$("zhItems").value=(row.zh?.items||[]).join("\n");translations=null;$("preview").textContent="既存の翻訳を読み込みました。";status("編集内容を読み込みました。");window.scrollTo({top:0,behavior:"smooth"});}
+function prepareTranslations(){
+ if(!valid())return false;
+ const en={title:$("enTitle").value.trim(),date:pack().date,category:$("enCategory").value.trim(),items:$("enItems").value.split("\n").map(x=>x.trim()).filter(Boolean)};
+ const zh={title:$("zhTitle").value.trim(),date:pack().date,category:$("zhCategory").value.trim(),items:$("zhItems").value.split("\n").map(x=>x.trim()).filter(Boolean)};
+ if(!en.title||!en.category||!en.items.length||!zh.title||!zh.category||!zh.items.length){status("英語・中国語のタイトル、カテゴリ、更新内容もすべて入力してください。",true);return false;}
+ translations={en,zh};
+ $("preview").textContent="English: "+en.title+" / 中文: "+zh.title;
+ status("3言語の内容を確認しました。公開または下書き保存できます。");
+ return true;
 }
 async function save(published){
  if(!valid())return;
- if(!translations){status("先に「翻訳してプレビュー」を押してください。",true);return;}
+ if(!translations&&!prepareTranslations())return;
  const p=pack();translations.en.date=p.date;translations.zh.date=p.date;
  const record={ja:p,en:translations.en,zh:translations.zh,published,updated_at:new Date().toISOString()};
  const id=$("recordId").value;
@@ -58,9 +58,9 @@ async function save(published){
 }
 async function togglePublish(row){const {error}=await db.from("site_updates").update({published:!row.published,updated_at:new Date().toISOString()}).eq("id",row.id);if(error){status(error.message,true);return;}await loadEntries();}
 async function deleteRow(id){if(!confirm("この更新履歴を削除しますか？"))return;const {error}=await db.from("site_updates").delete().eq("id",id);if(error){status(error.message,true);return;}status("削除しました。");await loadEntries();}
-function clearForm(){$("recordId").value="";$("formHeading").textContent="新しい更新を追加";$("title").value="";$("date").value=today;$("category").value="";$("items").value="";$("preview").textContent="";translations=null;}
+function clearForm(){$("recordId").value="";$("formHeading").textContent="新しい更新を追加";["title","category","items","enTitle","enCategory","enItems","zhTitle","zhCategory","zhItems"].forEach(id=>$(id).value="");$("date").value=today;$("preview").textContent="";translations=null;}
 $("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login();});
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
-$("translateBtn").addEventListener("click",translate);$("publishBtn").addEventListener("click",()=>save(true));$("draftBtn").addEventListener("click",()=>save(false));$("clearBtn").addEventListener("click",clearForm);
+$("translateBtn").addEventListener("click",prepareTranslations);$("publishBtn").addEventListener("click",()=>save(true));$("draftBtn").addEventListener("click",()=>save(false));$("clearBtn").addEventListener("click",clearForm);
 db.auth.getSession().then(({data})=>adminCheck(data.session));db.auth.onAuthStateChange((_e,s)=>{if(!s){$("manager").classList.add("hidden");$("loginPanel").classList.remove("hidden");}});
 })();
