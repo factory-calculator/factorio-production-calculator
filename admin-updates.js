@@ -35,6 +35,28 @@ async function loadEntries(){
  });
 }
 function editRow(row){$("recordId").value=row.id;$("formHeading").textContent="更新履歴を編集";$("title").value=row.ja?.title||"";$("date").value=row.ja?.date||today;$("category").value=row.ja?.category||"";$("items").value=(row.ja?.items||[]).join("\n");$("enTitle").value=row.en?.title||"";$("enCategory").value=row.en?.category||"";$("enItems").value=(row.en?.items||[]).join("\n");$("zhTitle").value=row.zh?.title||"";$("zhCategory").value=row.zh?.category||"";$("zhItems").value=(row.zh?.items||[]).join("\n");translations=null;$("preview").textContent="既存の翻訳を読み込みました。";status("編集内容を読み込みました。");window.scrollTo({top:0,behavior:"smooth"});}
+function copyTranslationPrompt(){
+ if(!valid())return;
+ const p=pack();
+ const prompt=[
+ "次のFactorio Production Calculatorの更新情報を、意味や技術的な正確さを保って英語と中国語（簡体字）に翻訳してください。",
+ "タイトル、カテゴリ、更新内容をそれぞれ分け、更新内容は1行につき1項目で出力してください。",
+ "出力形式:",
+ "【English】","Title:","Category:","Update details:","- ...",
+ "【简体中文】","标题：","分类：","更新内容：","- ...",
+ "",
+ "【日本語の原文】",
+ "タイトル: "+p.title,
+ "カテゴリ: "+p.category,
+ "更新内容:",
+ ...p.items.map(x=>"- "+x)
+ ].join("\n");
+ navigator.clipboard.writeText(prompt).then(()=>status("翻訳依頼文をコピーしました。ChatGPTに貼り付けてください。")).catch(()=>{
+  const area=document.createElement("textarea");area.value=prompt;document.body.append(area);area.select();
+  const ok=document.execCommand("copy");area.remove();
+  status(ok?"翻訳依頼文をコピーしました。ChatGPTに貼り付けてください。":"コピーできませんでした。",!ok);
+ });
+}
 function prepareTranslations(){
  if(!valid())return false;
  const en={title:$("enTitle").value.trim(),date:pack().date,category:$("enCategory").value.trim(),items:$("enItems").value.split("\n").map(x=>x.trim()).filter(Boolean)};
@@ -61,6 +83,6 @@ async function deleteRow(id){if(!confirm("この更新履歴を削除します�
 function clearForm(){$("recordId").value="";$("formHeading").textContent="新しい更新を追加";["title","category","items","enTitle","enCategory","enItems","zhTitle","zhCategory","zhItems"].forEach(id=>$(id).value="");$("date").value=today;$("preview").textContent="";translations=null;}
 $("loginBtn").addEventListener("click",login);$("password").addEventListener("keydown",e=>{if(e.key==="Enter")login();});
 $("logoutBtn").addEventListener("click",async()=>{await db.auth.signOut();location.reload();});
-$("translateBtn").addEventListener("click",prepareTranslations);$("publishBtn").addEventListener("click",()=>save(true));$("draftBtn").addEventListener("click",()=>save(false));$("clearBtn").addEventListener("click",clearForm);
+$("copyPromptBtn").addEventListener("click",copyTranslationPrompt);$("translateBtn").addEventListener("click",prepareTranslations);$("publishBtn").addEventListener("click",()=>save(true));$("draftBtn").addEventListener("click",()=>save(false));$("clearBtn").addEventListener("click",clearForm);
 db.auth.getSession().then(({data})=>adminCheck(data.session));db.auth.onAuthStateChange((_e,s)=>{if(!s){$("manager").classList.add("hidden");$("loginPanel").classList.remove("hidden");}});
 })();
