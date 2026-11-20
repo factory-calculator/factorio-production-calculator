@@ -81,6 +81,35 @@ Let players keep multiple production plans, restore them later, and move a plan 
 - Existing recipe data, calculator output, CSV export, and item catalog remain unchanged.
 - Desktop and mobile behavior is checked in all three languages before release.
 
+
+## Milestone 3: Transport planner
+
+### Goal
+
+Turn the calculator's aggregated material demand into practical belt, pipe, and train transport estimates without changing the production calculation engine.
+
+### Initial scope
+
+- Show per-material solid flow and estimate dedicated belt lanes using the selected belt tier.
+- Support yellow, red, and blue belts in Base Game; add turbo belts only in Space Age.
+- Show fluid flow separately and estimate pipe count only when the user supplies a design flow per pipe; do not assume a universal pipe throughput.
+- Estimate train sets per material from user-configured wagons per train, round-trip time, cargo slots, item stack size, and fluid wagon capacity.
+- Keep Base Game and Space Age settings separate in browser storage.
+- Provide Japanese, English, and Simplified Chinese labels and a responsive layout.
+- Make assumptions visible; estimates do not simulate station loading, unloading, intersections, or detailed pipe geometry.
+
+### Acceptance criteria
+
+- Material rates are read from the existing calculation totals and update after every recalculation.
+- Fluids are never counted as belt cargo; solids are never counted as pipe flow.
+- Belt counts use items/second and preserve the existing belt conversion setting behavior.
+- Pipe counts remain unset until a positive per-pipe design flow is entered.
+- Train estimates validate all inputs and clearly state the per-material, separate-transport assumption.
+- Base Game does not offer turbo belts; Space Age does.
+- Settings persist independently for Base Game and Space Age.
+- Existing production results, material diagnostics, saved plans, CSV export, and item catalog remain unchanged.
+- Desktop and mobile layouts are checked in all three languages before release.
+
 ## Release process
 
 Develop on feature branches, review the diff, run regression checks, and merge only after the feature is verified in all supported languages and editions.
