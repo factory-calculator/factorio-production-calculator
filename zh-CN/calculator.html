@@ -1022,6 +1022,8 @@ button{font-weight:600}
 
   function clearCalculationOutput() {
     window.lastCalculation = null;
+    window.__factorioTransportData = null;
+    window.dispatchEvent(new Event("factorio:transport-data"));
     ["outTarget", "outMachines", "outRawKinds", "outPower"].forEach(id => $(id).textContent = "—");
     $("machines").innerHTML = "";
     $("raw").innerHTML = "";
