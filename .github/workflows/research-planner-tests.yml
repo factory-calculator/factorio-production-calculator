@@ -16,5 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Check JavaScript syntax
+        run: node --check research-planner.js && node --check research-planner-preview.js
       - name: Run research planner tests
         run: node research-planner.test.js
