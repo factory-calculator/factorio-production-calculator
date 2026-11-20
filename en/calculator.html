@@ -1011,6 +1011,117 @@ button{font-weight:600}
     if ($("layoutSummary")) $("layoutSummary").textContent = "No calculation results.";
   }
 
+  const supplyFooterText = document.querySelector("footer")?.textContent || "";
+  const supplyStorageKey = "factorio_supply_rates_v1_" + ((supplyFooterText.includes("Space Age版") || supplyFooterText.includes("Space Age Calculator") || document.title.toLowerCase().includes("space age") || document.title.includes("太空时代")) ? "space" : "base");
+  let supplyRates = {};
+  try { supplyRates = JSON.parse(localStorage.getItem(supplyStorageKey) || "{}") || {}; } catch (_) { supplyRates = {}; }
+  const supplyLang = (document.documentElement.lang || "en").toLowerCase();
+  const supplyText = supplyLang.startsWith("zh") ? {
+    title:"原材料供应量检查", note:"输入每种原材料当前可供应的数量（每分钟）。留空表示尚未确认，不会被当作零供应量。流体也会单独列出，不计入传送带负载。",
+    material:"原材料", required:"需求量/分钟", available:"供应量/分钟", balance:"差额/分钟", status:"状态", placeholder:"尚未设置", reset:"清除供应量",
+    unset:"未设置", shortage:"供应不足", enough:"满足需求", surplus:"供应过剩", invalid:"请输入不小于 0 的数值",
+    summary:function(a,b,c){return "供应不足 "+a+" 种 · 满足需求 "+b+" 种 · 尚未设置 "+c+" 种";}
+  } : supplyLang === "ja" ? {
+    title:"素材供給量チェック", note:"素材ごとの現在の供給量を個/分で入力してください。未入力は未確認として扱い、供給ゼロとは判定しません。流体も表示しますが、ベルト負荷には含めません。",
+    material:"素材", required:"必要量/分", available:"供給量/分", balance:"差分/分", status:"判定", placeholder:"未設定", reset:"供給量をクリア",
+    unset:"未確認", shortage:"供給不足", enough:"充足", surplus:"供給過剰", invalid:"0以上の数値を入力してください",
+    summary:function(a,b,c){return "供給不足 "+a+"種類 · 充足 "+b+"種類 · 未確認 "+c+"種類";}
+  } : {
+    title:"Material supply check", note:"Enter the current available rate for each material (per minute). Blank values are treated as unknown, not zero. Fluids are included here but are not counted as belt cargo.",
+    material:"Material", required:"Required / min", available:"Available / min", balance:"Balance / min", status:"Status", placeholder:"Not set", reset:"Clear supply rates",
+    unset:"Not set", shortage:"Shortage", enough:"Sufficient", surplus:"Surplus", invalid:"Enter a number greater than or equal to 0",
+    summary:function(a,b,c){return a+" short · "+b+" sufficient · "+c+" not set";}
+  };
+  function updateSupplyRow(row) {
+    if (!row) return;
+    const input = row.querySelector("[data-supply-input]");
+    const status = row.querySelector("[data-supply-status]");
+    const balance = row.querySelector("[data-supply-balance]");
+    if (!input || !status || !balance) return;
+    const rawValue = input.value.trim();
+    status.className = "supply-status";
+    if (rawValue === "") {
+      status.textContent = supplyText.unset;
+      status.classList.add("supply-unset");
+      balance.textContent = "—";
+      return;
+    }
+    const available = Number(rawValue);
+    if (!Number.isFinite(available) || available < 0) {
+      status.textContent = supplyText.invalid;
+      status.classList.add("supply-shortage");
+      balance.textContent = "—";
+      return;
+    }
+    const required = Number(input.dataset.required);
+    const difference = available - required;
+    const epsilon = Math.max(1e-9, Math.abs(required) * 1e-9);
+    if (difference < -epsilon) {
+      status.textContent = supplyText.shortage;
+      status.classList.add("supply-shortage");
+      balance.textContent = "−" + fmt(Math.abs(difference));
+    } else if (difference > epsilon) {
+      status.textContent = supplyText.surplus;
+      status.classList.add("supply-surplus");
+      balance.textContent = "+" + fmt(difference);
+    } else {
+      status.textContent = supplyText.enough;
+      status.classList.add("supply-enough");
+      balance.textContent = "0";
+    }
+  }
+  function updateSupplySummary() {
+    const summary = $("supplySummary");
+    if (!summary) return;
+    const rows = Array.from($("bottleneckSummary").querySelectorAll("[data-supply-row]"));
+    let shortage = 0, enough = 0, unset = 0;
+    rows.forEach(row => {
+      const input = row.querySelector("[data-supply-input]");
+      if (!input || input.value.trim() === "") { unset++; return; }
+      const value = Number(input.value);
+      if (!Number.isFinite(value) || value < 0) { unset++; return; }
+      const required = Number(input.dataset.required);
+      if (value + Math.max(1e-9, Math.abs(required) * 1e-9) < required) shortage++;
+      else enough++;
+    });
+    summary.textContent = supplyText.summary(shortage, enough, unset);
+  }
+  function renderSupplyTable(entries) {
+    const rows = entries.map(([name, required]) => {
+      const saved = Object.prototype.hasOwnProperty.call(supplyRates, name) ? String(supplyRates[name]) : "";
+      return '<tr data-supply-row><td>' + escapeHtml(name) + '</td><td class="num">' + fmt(required) + '</td><td><input class="supply-input" type="number" min="0" step="any" inputmode="decimal" placeholder="' + supplyText.placeholder + '" value="' + escapeHtml(saved) + '" data-supply-input data-required="' + Number(required) + '" data-material="' + escapeHtml(name) + '" aria-label="' + escapeHtml(name + " " + supplyText.available) + '"></td><td class="num" data-supply-balance>—</td><td><span class="supply-status supply-unset" data-supply-status>' + supplyText.unset + '</span></td></tr>';
+    }).join("");
+    return '<section class="supply-panel"><div class="supply-heading"><h4>' + supplyText.title + '</h4><button type="button" class="secondary" data-supply-reset>' + supplyText.reset + '</button></div><p class="note">' + supplyText.note + '</p><p class="supply-summary" id="supplySummary"></p><div class="supply-table-wrap"><table class="supply-table"><thead><tr><th>' + supplyText.material + '</th><th class="num">' + supplyText.required + '</th><th>' + supplyText.available + '</th><th class="num">' + supplyText.balance + '</th><th>' + supplyText.status + '</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+  }
+  const supplyContainer = $("bottleneckSummary");
+  if (supplyContainer && !supplyContainer.dataset.supplyBound) {
+    supplyContainer.dataset.supplyBound = "1";
+    supplyContainer.addEventListener("input", event => {
+      const input = event.target.closest("[data-supply-input]");
+      if (!input) return;
+      const name = input.dataset.material;
+      const rawValue = input.value.trim();
+      if (rawValue === "") {
+        delete supplyRates[name];
+      } else {
+        const value = Number(rawValue);
+        if (!Number.isFinite(value) || value < 0) { updateSupplyRow(input.closest("[data-supply-row]")); updateSupplySummary(); return; }
+        supplyRates[name] = value;
+      }
+      try { localStorage.setItem(supplyStorageKey, JSON.stringify(supplyRates)); } catch (_) {}
+      updateSupplyRow(input.closest("[data-supply-row]"));
+      updateSupplySummary();
+    });
+    supplyContainer.addEventListener("click", event => {
+      if (!event.target.closest("[data-supply-reset]")) return;
+      supplyRates = {};
+      try { localStorage.removeItem(supplyStorageKey); } catch (_) {}
+      supplyContainer.querySelectorAll("[data-supply-input]").forEach(input => { input.value = ""; updateSupplyRow(input.closest("[data-supply-row]")); });
+      updateSupplySummary();
+    });
+  }
+
+
   function calc() {
     const selectedTarget = state.recipes.find(x => x.name === $("target").value);
     const singleRate = getRateInMin();
@@ -1160,116 +1271,6 @@ button{font-weight:600}
         : "No Space Age-specific planetary recipes are used in this production chain.";
     }
 
-
-  const supplyFooterText = document.querySelector("footer")?.textContent || "";
-  const supplyStorageKey = "factorio_supply_rates_v1_" + ((supplyFooterText.includes("Space Age版") || supplyFooterText.includes("Space Age Calculator") || document.title.toLowerCase().includes("space age") || document.title.includes("太空时代")) ? "space" : "base");
-  let supplyRates = {};
-  try { supplyRates = JSON.parse(localStorage.getItem(supplyStorageKey) || "{}") || {}; } catch (_) { supplyRates = {}; }
-  const supplyLang = (document.documentElement.lang || "en").toLowerCase();
-  const supplyText = supplyLang.startsWith("zh") ? {
-    title:"原材料供应量检查", note:"输入每种原材料当前可供应的数量（每分钟）。留空表示尚未确认，不会被当作零供应量。流体也会单独列出，不计入传送带负载。",
-    material:"原材料", required:"需求量/分钟", available:"供应量/分钟", balance:"差额/分钟", status:"状态", placeholder:"尚未设置", reset:"清除供应量",
-    unset:"未设置", shortage:"供应不足", enough:"满足需求", surplus:"供应过剩", invalid:"请输入不小于 0 的数值",
-    summary:function(a,b,c){return "供应不足 "+a+" 种 · 满足需求 "+b+" 种 · 尚未设置 "+c+" 种";}
-  } : supplyLang === "ja" ? {
-    title:"素材供給量チェック", note:"素材ごとの現在の供給量を個/分で入力してください。未入力は未確認として扱い、供給ゼロとは判定しません。流体も表示しますが、ベルト負荷には含めません。",
-    material:"素材", required:"必要量/分", available:"供給量/分", balance:"差分/分", status:"判定", placeholder:"未設定", reset:"供給量をクリア",
-    unset:"未確認", shortage:"供給不足", enough:"充足", surplus:"供給過剰", invalid:"0以上の数値を入力してください",
-    summary:function(a,b,c){return "供給不足 "+a+"種類 · 充足 "+b+"種類 · 未確認 "+c+"種類";}
-  } : {
-    title:"Material supply check", note:"Enter the current available rate for each material (per minute). Blank values are treated as unknown, not zero. Fluids are included here but are not counted as belt cargo.",
-    material:"Material", required:"Required / min", available:"Available / min", balance:"Balance / min", status:"Status", placeholder:"Not set", reset:"Clear supply rates",
-    unset:"Not set", shortage:"Shortage", enough:"Sufficient", surplus:"Surplus", invalid:"Enter a number greater than or equal to 0",
-    summary:function(a,b,c){return a+" short · "+b+" sufficient · "+c+" not set";}
-  };
-  function updateSupplyRow(row) {
-    if (!row) return;
-    const input = row.querySelector("[data-supply-input]");
-    const status = row.querySelector("[data-supply-status]");
-    const balance = row.querySelector("[data-supply-balance]");
-    if (!input || !status || !balance) return;
-    const rawValue = input.value.trim();
-    status.className = "supply-status";
-    if (rawValue === "") {
-      status.textContent = supplyText.unset;
-      status.classList.add("supply-unset");
-      balance.textContent = "—";
-      return;
-    }
-    const available = Number(rawValue);
-    if (!Number.isFinite(available) || available < 0) {
-      status.textContent = supplyText.invalid;
-      status.classList.add("supply-shortage");
-      balance.textContent = "—";
-      return;
-    }
-    const required = Number(input.dataset.required);
-    const difference = available - required;
-    const epsilon = Math.max(1e-9, Math.abs(required) * 1e-9);
-    if (difference < -epsilon) {
-      status.textContent = supplyText.shortage;
-      status.classList.add("supply-shortage");
-      balance.textContent = "−" + fmt(Math.abs(difference));
-    } else if (difference > epsilon) {
-      status.textContent = supplyText.surplus;
-      status.classList.add("supply-surplus");
-      balance.textContent = "+" + fmt(difference);
-    } else {
-      status.textContent = supplyText.enough;
-      status.classList.add("supply-enough");
-      balance.textContent = "0";
-    }
-  }
-  function updateSupplySummary() {
-    const summary = $("supplySummary");
-    if (!summary) return;
-    const rows = Array.from($("bottleneckSummary").querySelectorAll("[data-supply-row]"));
-    let shortage = 0, enough = 0, unset = 0;
-    rows.forEach(row => {
-      const input = row.querySelector("[data-supply-input]");
-      if (!input || input.value.trim() === "") { unset++; return; }
-      const value = Number(input.value);
-      if (!Number.isFinite(value) || value < 0) { unset++; return; }
-      const required = Number(input.dataset.required);
-      if (value + Math.max(1e-9, Math.abs(required) * 1e-9) < required) shortage++;
-      else enough++;
-    });
-    summary.textContent = supplyText.summary(shortage, enough, unset);
-  }
-  function renderSupplyTable(entries) {
-    const rows = entries.map(([name, required]) => {
-      const saved = Object.prototype.hasOwnProperty.call(supplyRates, name) ? String(supplyRates[name]) : "";
-      return '<tr data-supply-row><td>' + escapeHtml(name) + '</td><td class="num">' + fmt(required) + '</td><td><input class="supply-input" type="number" min="0" step="any" inputmode="decimal" placeholder="' + supplyText.placeholder + '" value="' + escapeHtml(saved) + '" data-supply-input data-required="' + Number(required) + '" data-material="' + escapeHtml(name) + '" aria-label="' + escapeHtml(name + " " + supplyText.available) + '"></td><td class="num" data-supply-balance>—</td><td><span class="supply-status supply-unset" data-supply-status>' + supplyText.unset + '</span></td></tr>';
-    }).join("");
-    return '<section class="supply-panel"><div class="supply-heading"><h4>' + supplyText.title + '</h4><button type="button" class="secondary" data-supply-reset>' + supplyText.reset + '</button></div><p class="note">' + supplyText.note + '</p><p class="supply-summary" id="supplySummary"></p><div class="supply-table-wrap"><table class="supply-table"><thead><tr><th>' + supplyText.material + '</th><th class="num">' + supplyText.required + '</th><th>' + supplyText.available + '</th><th class="num">' + supplyText.balance + '</th><th>' + supplyText.status + '</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
-  }
-  const supplyContainer = $("bottleneckSummary");
-  if (supplyContainer && !supplyContainer.dataset.supplyBound) {
-    supplyContainer.dataset.supplyBound = "1";
-    supplyContainer.addEventListener("input", event => {
-      const input = event.target.closest("[data-supply-input]");
-      if (!input) return;
-      const name = input.dataset.material;
-      const rawValue = input.value.trim();
-      if (rawValue === "") {
-        delete supplyRates[name];
-      } else {
-        const value = Number(rawValue);
-        if (!Number.isFinite(value) || value < 0) { updateSupplyRow(input.closest("[data-supply-row]")); updateSupplySummary(); return; }
-        supplyRates[name] = value;
-      }
-      try { localStorage.setItem(supplyStorageKey, JSON.stringify(supplyRates)); } catch (_) {}
-      updateSupplyRow(input.closest("[data-supply-row]"));
-      updateSupplySummary();
-    });
-    supplyContainer.addEventListener("click", event => {
-      if (!event.target.closest("[data-supply-reset]")) return;
-      supplyRates = {};
-      try { localStorage.removeItem(supplyStorageKey); } catch (_) {}
-      supplyContainer.querySelectorAll("[data-supply-input]").forEach(input => { input.value = ""; updateSupplyRow(input.closest("[data-supply-row]")); });
-      updateSupplySummary();
-    });
-  }
 
     const rawEntries = Object.entries(totals.raw).filter(([name]) => !FLUID_NAMES.has(name)).sort((a,b) => b[1]-a[1]);
     const diagnosticMax = Math.max(1, ...rawEntries.map(([,v]) => v / 60));
