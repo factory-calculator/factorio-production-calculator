@@ -1809,8 +1809,28 @@ button{font-weight:600}
   refreshRecipeEditor();
   $("target").value = "電子基板";
   calc();
+  window.__factorioPlanApi = {
+    edition: APP_EDITION,
+    getRecipeNames: () => state.recipes.map(recipe => recipe.name),
+    getTarget: () => $("target").value,
+    setTarget: name => { if (state.recipes.some(recipe => recipe.name === name)) $("target").value = name; },
+    getSettings: () => currentSettings(),
+    applySettings: settings => applySettings(settings),
+    getProductionPlan: () => state.productionPlan.map(item => ({name:item.name, rate:Number(item.rate)})),
+    setProductionPlan: items => {
+      state.productionPlan = items.map(item => ({name:item.name, rate:Number(item.rate)}));
+      renderProductionPlan();
+    },
+    getSupplyRates: () => ({...supplyRates}),
+    setSupplyRates: values => {
+      supplyRates = {...values};
+      try { localStorage.setItem(supplyStorageKey, JSON.stringify(supplyRates)); } catch (_) {}
+    },
+    calc: () => calc()
+  };
 })();
 </script>
+<script src="../plan-manager.js"></script>
 
 <script>
 (() => {
