@@ -54,6 +54,33 @@ Turn the existing material/belt bottleneck view into a practical diagnostic by c
 - Existing CSV export and item catalog continue to work.
 - Tests cover no-input, exact-match, shortage, surplus, multiple-target, and Space Age cases.
 
+## Milestone 2: Plan save and share
+
+### Goal
+
+Let players keep multiple production plans, restore them later, and move a plan between browsers or devices without requiring an account or server.
+
+### Initial scope
+
+- Automatically save the active plan and calculator settings in browser storage.
+- Keep saved plans separate between Base Game and Space Age.
+- Save multiple named plans and allow loading, overwriting, and deleting them.
+- Export a selected or current plan as a versioned JSON file and import it with validation.
+- Include the selected target, production targets, calculator settings, and material supply rates.
+- Reject files for the wrong game edition and plans containing items unavailable in the active dataset.
+- Keep the feature local-first; no account, cloud sync, or public sharing service is required for this milestone.
+- Provide Japanese, English, and Simplified Chinese labels.
+
+### Acceptance criteria
+
+- Editing a plan and reloading the same browser restores the latest working state.
+- Named plans survive reloads and remain separate by game edition.
+- JSON export/import round-trips the plan, settings, and supply rates.
+- Invalid, oversized, or wrong-edition files are rejected without replacing the current plan.
+- Imported item names and numeric rates are validated before applying.
+- Existing recipe data, calculator output, CSV export, and item catalog remain unchanged.
+- Desktop and mobile behavior is checked in all three languages before release.
+
 ## Release process
 
 Develop on feature branches, review the diff, run regression checks, and merge only after the feature is verified in all supported languages and editions.
