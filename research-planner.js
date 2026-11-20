@@ -113,7 +113,7 @@
       if (!target || typeof target.id !== "string") throw new Error("Invalid research target");
       const tech = dataset.technologies.get(target.id);
       if (!tech) throw new Error("Technology is unavailable in this edition or excluded");
-      const level = Number(target.level || 1);
+      const level = target.level == null ? 1 : Number(target.level);
       if (!Number.isInteger(level) || level < 1 || level > 100000) throw new Error("Invalid target level");
       const max = tech.maxLevel === "infinite" ? Infinity : Number(tech.maxLevel || 1);
       if (level > max) throw new Error("Target level exceeds the technology maximum");
