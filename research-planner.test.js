@@ -105,7 +105,7 @@ check("empty target selection is rejected", () => {
 
 check("standalone preview contains syntactically valid bundled scripts", () => {
   const html = fs.readFileSync("research-planner-preview-standalone.html", "utf8");
-  const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)].map(match => match[1]);
+  const scripts = html.split("<script>").slice(1).map(part => part.split("</script>")[0]);
   assert.equal(scripts.length, 2);
   scripts.forEach(source => new vm.Script(source));
   assert.match(html, /name="robots" content="noindex,nofollow"/);
