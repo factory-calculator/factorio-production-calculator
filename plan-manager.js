@@ -99,5 +99,7 @@
   });
   document.addEventListener("input",event=>{if(event.target.closest("#factorioPlanManager"))return;if(event.target.matches("input,select"))saveDraft()});
   document.addEventListener("change",event=>{if(event.target.closest("#factorioPlanManager"))return;if(event.target.matches("input,select"))saveDraft()});
+  document.addEventListener("click",event=>{if(!event.target.closest("#factorioPlanManager"))saveDraft()});
+  if (window.MutationObserver) new MutationObserver(() => saveDraft()).observe(host,{childList:true,subtree:true});
   renderList();if(!restoreDraft())saveDraft();
 })();
