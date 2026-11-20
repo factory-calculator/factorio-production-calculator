@@ -1258,6 +1258,8 @@ button{font-weight:600}
     const solids = Object.entries(totals.raw).filter(([n]) => !FLUID_NAMES.has(n));
     const solidRate = solids.reduce((sum, [, v]) => sum + v / 60, 0);
     const beltCount = solidRate / beltRate;
+    window.__factorioTransportData = { edition: APP_EDITION, raw: {...totals.raw}, fluids: {...totals.fluidRaw} };
+    window.dispatchEvent(new Event("factorio:transport-data"));
 
     $("beltSummary").innerHTML = `Total solid material throughput: <b>${fmt(solidRate)} items/s</b><br>Selected belt conversion: <b>${fmt(beltCount)} belts</b> (theoretical; assumes different materials can share a belt)`;
     const solarPanels = Math.ceil(totals.powerKw / 42);
@@ -1807,6 +1809,7 @@ button{font-weight:600}
 })();
 </script>
 <script src="../plan-manager.js"></script>
+<script src="../transport-planner.js"></script>
 
 <script>
 (() => {
