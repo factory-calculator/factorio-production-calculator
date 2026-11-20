@@ -40,7 +40,13 @@ Record the exact game version and permitted source/provenance in each dataset. D
 | Trigger/condition-based unlocks are represented separately | TODO | TODO | |
 | No Base Game-only technology leaks into Space Age or vice versa | TODO | TODO | |
 
-## 3. Browser acceptance checks
+## 3. Interactive preview
+
+A responsive, three-language interaction prototype is available at `research-planner-preview.html` with behavior in `research-planner-preview.js`. It intentionally uses fictional sample technology names and costs only. It is not connected to real Factorio technology data and must not be presented as a complete calculator. The preview supports edition switching, localized search, target selection, infinite-research current/target levels, completed-tech exclusions, science-pack totals, prerequisite ordering, and condition-based unlock display.
+
+The preview is committed to the feature branch and is not part of the public website. It still requires a browser session to verify visual behavior and accessibility.
+
+## 4. Browser acceptance checks
 
 Do not mark these PASS based only on unit tests. Perform them in an actual browser on desktop and a narrow mobile/tablet viewport.
 
@@ -60,7 +66,7 @@ Do not mark these PASS based only on unit tests. Perform them in an actual brows
 | Layout remains usable at mobile/tablet width | TODO | TODO | TODO |
 | Existing calculator, item list, saved plans, transport planner, and CSV export still work | TODO | TODO | TODO |
 
-## 4. Regression and release gates
+## 5. Regression and release gates
 
 - [ ] Automated test suite passes on the final feature commit.
 - [ ] Both edition datasets pass the data acceptance table.
@@ -70,7 +76,7 @@ Do not mark these PASS based only on unit tests. Perform them in an actual brows
 - [ ] Pull request diff reviewed; no unrelated public-page changes.
 - [ ] Public deployment is performed only after explicit release approval and successful Pages workflow.
 
-## 5. Test record
+## 6. Test record
 
 | Field | Value |
 |---|---|
@@ -79,4 +85,5 @@ Do not mark these PASS based only on unit tests. Perform them in an actual brows
 | Browser/device | TODO |
 | Dataset game version | TODO |
 | Reviewer | TODO |
-| Final result | NOT READY — data and UI are not yet implemented |
+| Preview UI | Implemented with fictional fixtures; browser verification pending |
+| Final result | NOT READY — permitted game data and browser verification are outstanding |
