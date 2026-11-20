@@ -42,7 +42,7 @@ Record the exact game version and permitted source/provenance in each dataset. D
 
 ## 3. Interactive preview
 
-A responsive, three-language interaction prototype is available at `research-planner-preview.html` with behavior in `research-planner-preview.js`. It intentionally uses fictional sample technology names and costs only. It is not connected to real Factorio technology data and must not be presented as a complete calculator. The preview supports edition switching, localized search, target selection, infinite-research current/target levels, completed-tech exclusions, science-pack totals, prerequisite ordering, and condition-based unlock display.
+A responsive, three-language interaction prototype is available at `research-planner-preview.html` with behavior in `research-planner-preview.js`. A single-file copy is available as `research-planner-preview-standalone.html` for easier manual opening. It intentionally uses fictional sample technology names and costs only. It is not connected to real Factorio technology data and must not be presented as a complete calculator. The preview supports edition switching, localized search, target selection, infinite-research current/target levels, completed-tech exclusions, science-pack totals, prerequisite ordering, and condition-based unlock display.
 
 The preview is committed to the feature branch and is not part of the public website. It still requires a browser session to verify visual behavior and accessibility.
 
