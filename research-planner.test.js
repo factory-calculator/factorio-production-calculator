@@ -24,7 +24,7 @@ const result = planner.plan(data, {
   completed: [],
   currentLevels: {}
 });
-assert.deepEqual(result.sciencePacks, {
+assert.deepEqual({ ...result.sciencePacks }, {
   "automation-science-pack": 10 + 20 + 2 * (110 + 120),
   "logistic-science-pack": 20
 });
