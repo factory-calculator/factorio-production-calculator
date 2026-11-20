@@ -23,7 +23,7 @@ if(!belt||!wagons||!cycle||!slots||!stack||!fluidCap||($("tpPipe").value.trim()&
 const rows=Object.keys(data.raw).sort((a,b)=>a.localeCompare(b)).map(name=>{
 const rate=Math.max(0,Number(data.raw[name])||0);if(!rate)return"";
 const isFluid=Object.prototype.hasOwnProperty.call(data.fluids||{},name);
-const beltCount=isFluid?"—":fmt(Math.ceil(rate/60/belt*100-1e-9)/100);
+const beltCount=isFluid?"—":fmt(Math.ceil(rate/60/belt-1e-9));
 const pipeCount=!isFluid?"—":pipe?fmt(Math.ceil(rate/60/pipe-1e-9)):t.unset;
 const cargo=isFluid?wagons*fluidCap:wagons*slots*stack;
 const trainCount=fmt(Math.ceil(rate*cycle/cargo-1e-9));
