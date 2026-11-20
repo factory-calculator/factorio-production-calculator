@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>研究計画プレビュー | Factorio Production Calculator</title>
+<style>
+:root{color-scheme:dark;--bg:#10151d;--panel:#192330;--panel2:#202d3b;--line:#344456;--text:#edf3f8;--muted:#9aabba;--accent:#e6a23c;--green:#7fc79a;--red:#e58b8b;--blue:#79b8e8}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0e141c,#17212c);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:22px max(18px,calc((100% - 1120px)/2));background:#141d28;border-bottom:1px solid var(--line)}
+h1{font-size:clamp(22px,4vw,32px);margin:0 0 5px}header p{margin:0;color:var(--muted)}
+main{max-width:1120px;margin:22px auto;padding:0 16px 60px;display:grid;gap:16px}
+.notice{border:1px solid #a66b28;background:#382b1b;color:#ffe0ae;padding:12px 14px;border-radius:10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar label{display:flex;align-items:center;gap:8px;color:var(--muted)}
+button,input,select{font:inherit;color:var(--text);background:#101923;border:1px solid var(--line);border-radius:8px;padding:9px 11px;min-width:0}
+button{cursor:pointer;background:#9a641d;border-color:#c68b38;font-weight:650}
+button.secondary{background:#263545;border-color:#40546a}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.editions{display:flex;gap:8px;flex-wrap:wrap}.edition[aria-pressed="true"]{background:#9a641d;border-color:#c68b38}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 8px;color:var(--blue)}
+.search{width:100%;margin-bottom:10px}
+.tech-list,.selected-list,.completed-list{display:grid;gap:8px}
+.tech-row,.selected-row,.completed-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+.tech-row>div,.selected-row>div{min-width:0}.tech-row small,.selected-row small{display:block;color:var(--muted)}
+.selected-row{align-items:flex-start}.selected-row input{width:88px}
+.selected-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.completed-row{justify-content:flex-start}
+.muted{color:var(--muted);font-size:13px}.empty{color:var(--muted);padding:12px;border:1px dashed var(--line);border-radius:8px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:21px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:9px 7px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.results{display:grid;gap:16px}.error{color:#ffd1d1;background:#4a2222;border:1px solid #9a4b4b;padding:10px;border-radius:8px}.success{color:#c8f0d2}
+@media(max-width:720px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}header{padding:18px 16px}.panel{padding:13px}.tech-row{align-items:flex-start}.tech-row button{white-space:nowrap}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="pageTitle">研究計画プレビュー</h1>
+  <p id="pageSubtitle">研究対象を選び、前提技術と必要なサイエンスパックを確認できます。</p>
+</header>
+<main>
+  <div class="notice" id="demoNotice">これは画面・操作確認用のデモです。表示される技術名・数値は架空のサンプルで、Factorioの実データではありません。</div>
+  <section class="panel toolbar" aria-label="表示設定">
+    <div class="editions">
+      <button class="edition" type="button" data-edition="base" aria-pressed="true">Base Game</button>
+      <button class="edition secondary" type="button" data-edition="spaceage" aria-pressed="false">Space Age</button>
+    </div>
+    <label><span id="languageLabel">言語</span>
+      <select id="language">
+        <option value="ja">日本語</option><option value="en">English</option><option value="zh-CN">简体中文</option>
+      </select>
+    </label>
+    <button id="reset" class="secondary" type="button">リセット</button>
+  </section>
+
+  <div class="layout">
+    <section class="panel">
+      <h2 id="availableTitle">技術を検索して追加</h2>
+      <input id="search" class="search" type="search" placeholder="技術名で検索" autocomplete="off">
+      <div id="technologyList" class="tech-list"></div>
+    </section>
+    <section class="panel">
+      <h2 id="targetsTitle">研究目標</h2>
+      <div id="selectedList" class="selected-list"></div>
+      <h3 id="completedTitle" style="margin-top:18px">研究済み技術</h3>
+      <p class="muted" id="completedHelp">チェックした技術は必要コストから除外します。</p>
+      <div id="completedList" class="completed-list"></div>
+    </section>
+  </div>
+
+  <section class="panel results">
+    <div class="toolbar">
+      <h2 id="resultTitle" style="margin:0">計算結果</h2>
+      <button id="calculate" type="button">研究コストを計算</button>
+      <span id="status" class="muted" role="status" aria-live="polite"></span>
+    </div>
+    <div id="error" aria-live="polite"></div>
+    <div id="summary"></div>
+    <div>
+      <h3 id="orderTitle">研究順序と必要量</h3>
+      <div id="orderTable"></div>
+    </div>
+    <div>
+      <h3 id="packsTitle">サイエンスパック合計</h3>
+      <div id="packsTable"></div>
+    </div>
+    <div>
+      <h3 id="conditionsTitle">条件による解放</h3>
+      <div id="conditions"></div>
+    </div>
+  </section>
+</main>
+<script src="research-planner.js"></script>
+<script src="research-planner-preview.js"></script>
+</body>
+</html>
