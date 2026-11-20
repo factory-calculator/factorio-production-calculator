@@ -1,5 +1,7 @@
 "use strict";
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
 const planner = require("./research-planner.js");
 
 const checks = [];
@@ -99,6 +101,14 @@ check("malformed datasets, duplicate IDs, missing prerequisites, and cycles are 
 });
 check("empty target selection is rejected", () => {
   assert.throws(() => planner.plan(base, { edition: "base", targets: [] }));
+});
+
+check("standalone preview contains syntactically valid bundled scripts", () => {
+  const html = fs.readFileSync("research-planner-preview-standalone.html", "utf8");
+  const scripts = [...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)].map(match => match[1]);
+  assert.equal(scripts.length, 2);
+  scripts.forEach(source => new vm.Script(source));
+  assert.match(html, /name="robots" content="noindex,nofollow"/);
 });
 
 console.log(JSON.stringify({ status: "passed", checks: checks.length, checkNames: checks }, null, 2));
