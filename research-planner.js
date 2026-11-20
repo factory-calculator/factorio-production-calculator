@@ -78,7 +78,11 @@
 
     const blocked = new Set();
     for (const tech of all.values()) {
-      if (tech.policyExcluded === true || tech.category === "combat") blocked.add(tech.id);
+      const prerequisites = tech.prerequisites == null ? [] : tech.prerequisites;
+      if (!Array.isArray(prerequisites)) throw new Error("Prerequisites must be an array for " + tech.id);
+      if (tech.policyExcluded === true || tech.category === "combat" || tech.hidden === true || tech.enabled === false) {
+        blocked.add(tech.id);
+      }
     }
     let changed = true;
     while (changed) {
@@ -94,7 +98,7 @@
 
     const available = new Map();
     for (const [id, tech] of all) {
-      if (blocked.has(id) || tech.hidden === true || tech.enabled === false) continue;
+      if (blocked.has(id)) continue;
       const prereqs = Array.isArray(tech.prerequisites) ? tech.prerequisites : [];
       if (prereqs.some(p => !all.has(p))) throw new Error("Unknown prerequisite for " + id);
       available.set(id, tech);
@@ -108,6 +112,19 @@
     }
     const dataset = normalizeDataset(input, request.edition);
     const completed = new Set(Array.isArray(request.completed) ? request.completed : []);
+    const currentLevels = request.currentLevels == null ? {} : request.currentLevels;
+    if (!currentLevels || typeof currentLevels !== "object" || Array.isArray(currentLevels)) {
+      throw new Error("Current research levels must be an object");
+    }
+    for (const [id, rawLevel] of Object.entries(currentLevels)) {
+      const tech = dataset.technologies.get(id);
+      const level = Number(rawLevel);
+      if (!tech || !Number.isInteger(level) || level < 0 || level > 100000) {
+        throw new Error("Invalid current research level for " + id);
+      }
+      const max = tech.maxLevel === "infinite" ? Infinity : Number(tech.maxLevel || 1);
+      if (level > max) throw new Error("Current research level exceeds the technology maximum for " + id);
+    }
     const requested = new Map();
     for (const target of request.targets) {
       if (!target || typeof target.id !== "string") throw new Error("Invalid research target");
@@ -145,7 +162,7 @@
         rows.push({ id, kind: "condition", levels: 0, units: 0, seconds: 0 });
         continue;
       }
-      const from = Math.max(0, Number(request.currentLevels && request.currentLevels[id]) || 0);
+      const from = Number(currentLevels[id] || 0);
       const to = neededLevels.get(id) || 1;
       if (from >= to) continue;
       const time = Number(tech.timeSeconds);
@@ -157,6 +174,9 @@
           : Number(tech.unitCount);
         if (!Number.isFinite(count) || count < 0) throw new Error("Invalid unit count for " + id);
         units += Math.ceil(count);
+      }
+      if (tech.sciencePacks != null && !Array.isArray(tech.sciencePacks)) {
+        throw new Error("Science packs must be an array for " + id);
       }
       for (const pack of (tech.sciencePacks || [])) {
         if (!pack || typeof pack.id !== "string" || !Number.isFinite(Number(pack.amountPerUnit)) || Number(pack.amountPerUnit) < 0) {
