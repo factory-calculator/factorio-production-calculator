@@ -113,3 +113,27 @@ Turn the calculator's aggregated material demand into practical belt, pipe, and 
 ## Release process
 
 Develop on feature branches, review the diff, run regression checks, and merge only after the feature is verified in all supported languages and editions.
+
+
+## Milestone 4: Research planner — implementation in progress
+
+### Calculation core
+
+- Added a versioned dataset contract for separate Base Game and Space Age technology data.
+- Added prerequisite expansion with shared-prerequisite de-duplication and cycle detection.
+- Added completed-technology and current-level handling.
+- Added science-pack aggregation and research work totals.
+- Added a restricted arithmetic parser for infinite-research cost formulas; no dynamic code evaluation is used.
+- Added separate handling for condition/trigger-based unlocks.
+- Added a policy filter for combat-tagged technologies and all technologies that depend on them.
+- Added assertion-based smoke tests and a GitHub Actions workflow.
+
+### Remaining before integration
+
+- Populate versioned technology datasets from sources permitted for this project; do not copy third-party technology datasets.
+- Verify the exclusion classification against the source data.
+- Build the three-language research planner UI and connect it to the correct edition dataset.
+- Test prerequisite totals, infinite levels, completed research, and condition-based unlocks in both editions.
+- Confirm the UI and calculations on desktop/mobile in Japanese, English, and Simplified Chinese.
+
+The calculation engine is not yet connected to the public calculator pages. Do not deploy this milestone until its data and UI are complete and reviewed.
