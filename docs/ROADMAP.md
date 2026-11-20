@@ -128,6 +128,13 @@ Develop on feature branches, review the diff, run regression checks, and merge o
 - Added a policy filter for combat-tagged technologies and all technologies that depend on them.
 - Added assertion-based smoke tests and a GitHub Actions workflow.
 
+### Preview interface added
+
+- Added a responsive standalone preview page with Japanese, English, and Simplified Chinese UI strings.
+- Added edition switching, localized search, target selection, completed-tech controls, infinite-research current/target levels, science-pack totals, ordered prerequisite output, and separate condition-unlock output.
+- The preview uses clearly labeled fictional fixture data only; it is not actual Factorio data and is not linked from the public site.
+- Added JavaScript syntax checks to CI.
+
 ### Remaining before integration
 
 - Populate versioned technology datasets from sources permitted for this project; do not copy third-party technology datasets.
