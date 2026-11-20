@@ -23,6 +23,8 @@ const base = {
     { id: "trigger-demo", researchType: "condition", researchTrigger: { type: "demo" }, prerequisites: [], timeSeconds: 1, sciencePacks: [] },
     { id: "hidden-demo", hidden: true, prerequisites: [], unitCount: 1, timeSeconds: 1, sciencePacks: [] },
     { id: "disabled-demo", enabled: false, prerequisites: [], unitCount: 1, timeSeconds: 1, sciencePacks: [] },
+    { id: "hidden-dependent", prerequisites: ["hidden-demo"], unitCount: 1, timeSeconds: 1, sciencePacks: [] },
+    { id: "disabled-dependent", prerequisites: ["disabled-demo"], unitCount: 1, timeSeconds: 1, sciencePacks: [] },
     { id: "cycle-a", prerequisites: ["cycle-b"], unitCount: 1, timeSeconds: 1, sciencePacks: [] },
     { id: "cycle-b", prerequisites: ["cycle-a"], unitCount: 1, timeSeconds: 1, sciencePacks: [] }
   ]
@@ -70,6 +72,8 @@ check("hidden and disabled technologies are excluded", () => {
   const normalized = planner.normalizeDataset(base, "base");
   assert.equal(normalized.technologies.has("hidden-demo"), false);
   assert.equal(normalized.technologies.has("disabled-demo"), false);
+  assert.equal(normalized.technologies.has("hidden-dependent"), false);
+  assert.equal(normalized.technologies.has("disabled-dependent"), false);
 });
 check("condition-based unlocks are separated from science costs", () => {
   const r = planner.plan(base, { edition: "base", targets: [{ id: "trigger-demo" }] });
@@ -82,10 +86,14 @@ check("edition mismatch, unavailable targets, and invalid levels fail safely", (
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "not-real" }] }));
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics", level: 0 }] }));
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics", level: 2 }] }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "infinite-demo", level: 3 }], currentLevels: { "infinite-demo": -1 } }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "infinite-demo", level: 3 }], currentLevels: { "infinite-demo": 1.5 } }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "infinite-demo", level: 3 }], currentLevels: { "not-real": 1 } }));
 });
 check("malformed datasets, duplicate IDs, missing prerequisites, and cycles are rejected", () => {
   assert.throws(() => planner.normalizeDataset({ schemaVersion: 2, edition: "base", technologies: [] }));
   assert.throws(() => planner.normalizeDataset({ schemaVersion: 1, edition: "base", technologies: [{ id: "x" }, { id: "x" }] }));
+  assert.throws(() => planner.normalizeDataset({ schemaVersion: 1, edition: "base", technologies: [{ id: "x", prerequisites: "not-an-array" }] }));
   assert.throws(() => planner.plan({ schemaVersion: 1, edition: "base", technologies: [{ id: "x", prerequisites: ["missing"] }] }, { edition: "base", targets: [{ id: "x" }] }));
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "cycle-a" }] }));
 });
