@@ -11,7 +11,7 @@
 
   function parseFormula(source, level) {
     if (typeof source !== "string" || source.length > 200) throw new Error("Invalid research cost formula");
-    const tokens = source.match(/\s*(?:\d+(?:\.\d+)?|L|[()+*/^\-])/g);
+    const tokens = source.match(/\\s*(?:\\d+(?:\\.\\d+)?|L|[()+*/^\\-])/g)?.map(token => token.trim());
     if (!tokens || tokens.join("").replace(/\s/g, "") !== source.replace(/\s/g, "")) {
       throw new Error("Unsupported token in research cost formula");
     }
