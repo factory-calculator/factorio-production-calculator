@@ -10,7 +10,7 @@
 header{padding:28px max(20px,calc((100% - 1180px)/2));border-bottom:1px solid var(--line);background:#141d28;display:flex;justify-content:space-between;align-items:center}
 h1{margin:0 0 6px;font-size:clamp(23px,4vw,34px)}header p{margin:0;color:var(--muted)}
 main{max-width:1180px;margin:24px auto;padding:0 18px 60px;display:grid;gap:18px}
-.page{display:grid;gap:18px}.analysis-panel{padding-bottom:20px}.analysis-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid var(--line)}.analysis-tab{background:#263545;border-color:#40546a;min-width:0;padding:9px 14px}.analysis-tab.active{background:#9a641d;border-color:#c68b38;color:#fff}.analysis-view{min-height:90px}.analysis-view h3{margin-bottom:12px}.page-tabs{max-width:1180px;margin:18px auto 0;padding:0 18px;display:flex;gap:8px}.page-tab{background:#263545;border-color:#40546a;min-width:130px}.page-tab.active{background:#9a641d;border-color:#c68b38}.page-tabs a{text-decoration:none;text-align:center;display:inline-flex;align-items:center;justify-content:center}
+.page{display:grid;gap:18px}.research-preview-frame{display:block;width:100%;height:calc(100vh - 250px);min-height:760px;border:1px solid var(--line);border-radius:10px;background:#10151d}@media(max-width:600px){.research-preview-frame{height:78vh;min-height:680px}}.analysis-panel{padding-bottom:20px}.analysis-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px;padding-bottom:14px;border-bottom:1px solid var(--line)}.analysis-tab{background:#263545;border-color:#40546a;min-width:0;padding:9px 14px}.analysis-tab.active{background:#9a641d;border-color:#c68b38;color:#fff}.analysis-view{min-height:90px}.analysis-view h3{margin-bottom:12px}.page-tabs{max-width:1180px;margin:18px auto 0;padding:0 18px;display:flex;gap:8px}.page-tab{background:#263545;border-color:#40546a;min-width:130px}.page-tab.active{background:#9a641d;border-color:#c68b38}.page-tabs a{text-decoration:none;text-align:center;display:inline-flex;align-items:center;justify-content:center}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 10px 30px #0002}
 h2{font-size:18px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px;color:var(--blue)}
 .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
@@ -200,7 +200,7 @@ button{font-weight:600}
   </div>
   <button id="adminToggleBtn" type="button" class="admin-badge" style="display:none">自定义设置</button>
 </header>
-<nav class="page-tabs" aria-label="页面切换"><button type="button" class="page-tab active" data-page="calculatorPage">生产计算</button><button type="button" class="page-tab" data-page="catalogPage">物品目录</button></nav>
+<nav class="page-tabs" aria-label="页面切换"><button type="button" class="page-tab active" data-page="calculatorPage">生产计算</button><button type="button" class="page-tab" data-page="catalogPage">物品目录</button><button type="button" class="page-tab" data-page="researchPage">研究规划</button></nav>
 <main>
 <div id="calculatorPage" class="page">
 <section class="panel">
@@ -334,6 +334,7 @@ button{font-weight:600}
   </div>
 </section>
 </div>
+<div id="researchPage" class="page hidden"><iframe class="research-preview-frame" src="../research-planner-preview.html" title="研究规划" loading="lazy"></iframe></div>
 </main>
 
 <!-- カスタマイズモーダル -->
@@ -420,8 +421,8 @@ button{font-weight:600}
     const button = event.target.closest(".page-tab");
     if (!button) return;
     const pageId = button.dataset.page;
-    if (!["calculatorPage", "catalogPage"].includes(pageId)) return;
-    ["calculatorPage", "catalogPage"].forEach(id => {
+    if (!["calculatorPage", "catalogPage", "researchPage"].includes(pageId)) return;
+    ["calculatorPage", "catalogPage", "researchPage"].forEach(id => {
       const page = document.getElementById(id);
       if (page) page.classList.toggle("hidden", id !== pageId);
     });
@@ -1365,7 +1366,7 @@ button{font-weight:600}
   }
 
   function showPage(pageId) {
-    ["calculatorPage","catalogPage"].forEach(id => $(id).classList.toggle("hidden", id !== pageId));
+    ["calculatorPage","catalogPage","researchPage"].forEach(id => $(id).classList.toggle("hidden", id !== pageId));
     document.querySelectorAll(".page-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.page === pageId));
     if (pageId === "catalogPage") renderSupportedItems();
   }
