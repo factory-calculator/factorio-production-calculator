@@ -14,14 +14,14 @@
     if (!input || typeof input !== "object" || Array.isArray(input)) fail("Dataset must be a JSON object");
     if (input.schemaVersion !== 1) fail("Unsupported schemaVersion");
     if (!EDITIONS.has(input.edition)) fail("edition must be base or spaceage");
-    if (typeof input.gameVersion !== "string" || !/^\\d+\\.\\d+(\\.\\d+)?([+-][\\w.-]+)?$/.test(input.gameVersion)) {
+    if (typeof input.gameVersion !== "string" || !/^\d+\.\d+(\.\d+)?([+-][\w.-]+)?$/.test(input.gameVersion)) {
       fail("gameVersion must be a specific version, not a wildcard");
     }
     const p = input.provenance;
     if (!p || typeof p !== "object") fail("provenance is required");
     if (typeof p.sourceName !== "string" || !p.sourceName.trim()) fail("provenance.sourceName is required");
-    if (typeof p.sourceUrl !== "string" || !/^https:\\/\\//.test(p.sourceUrl)) fail("provenance.sourceUrl must be HTTPS");
-    if (typeof p.retrievedAt !== "string" || !/^\\d{4}-\\d{2}-\\d{2}$/.test(p.retrievedAt)) fail("provenance.retrievedAt must be YYYY-MM-DD");
+    if (typeof p.sourceUrl !== "string" || !/^https:\/\//.test(p.sourceUrl)) fail("provenance.sourceUrl must be HTTPS");
+    if (typeof p.retrievedAt !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(p.retrievedAt)) fail("provenance.retrievedAt must be YYYY-MM-DD");
     if (p.permissionStatus !== "approved" && !(opts.allowTestFixture === true && p.permissionStatus === "test-fixture")) {
       fail("Dataset is blocked until permissionStatus is approved");
     }
