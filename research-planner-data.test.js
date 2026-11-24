@@ -77,8 +77,9 @@ const cases = [
     const copy = structuredClone(valid);
     copy.technologies.push(structuredClone(copy.technologies[0]));
     assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /Duplicate technology id/);
-    copy.technologies[0].prerequisites = ["missing-tech"];
-    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /Unknown prerequisite/);
+    const missingPrerequisite = structuredClone(valid);
+    missingPrerequisite.technologies[0].prerequisites = ["missing-tech"];
+    assert.throws(() => intake.validate(missingPrerequisite, { allowTestFixture: true }), /Unknown prerequisite/);
   }],
   ["cycles are rejected", () => {
     const copy = structuredClone(valid);
