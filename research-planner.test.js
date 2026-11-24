@@ -70,6 +70,22 @@ check("invalid facility count and research speed are rejected", () => {
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchSpeedMultiplier: 0 }));
   assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchSpeedMultiplier: 1001 }));
 });
+check("mixed research facility groups aggregate effective research speed", () => {
+  const r = planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilities: [
+    { count: 2, speedMultiplier: 1 },
+    { count: 3, speedMultiplier: 2 }
+  ]});
+  assert.equal(r.researchFacilityCount, 5);
+  assert.equal(r.totalResearchSpeed, 8);
+  assert.equal(r.researchSpeedMultiplier, 1.6);
+  assert.equal(r.estimatedResearchSeconds, 31.25);
+  assert.equal(r.researchFacilities.length, 2);
+});
+check("invalid facility groups and excessive group counts are rejected", () => {
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilities: [{ count: 0, speedMultiplier: 1 }] }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilities: [{ count: 1, speedMultiplier: 0 }] }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilities: Array.from({ length: 21 }, () => ({ count: 1, speedMultiplier: 1 })) }));
+});
 check("completed prerequisite is not charged again", () => {
   const r = planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], completed: ["automation"] });
   assert.deepEqual(r.technologies.map(x => x.id), ["logistics"]);
