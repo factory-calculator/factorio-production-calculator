@@ -399,7 +399,10 @@ document.querySelectorAll(".edition").forEach(b=>b.addEventListener("click",()=>
 $("language").addEventListener("change",e=>{language=e.target.value;renderAll();});
 $("search").addEventListener("input",renderList);
 $("calculate").addEventListener("click",calculate);
-$("savePreset").addEventListener("click",savePreset);\n$("loadPreset").addEventListener("click",loadPreset);\n$("deletePreset").addEventListener("click",deletePreset);\n$("addFacility").addEventListener("click",()=>{if(facilityRows.length<20){facilityRows.push({count:1,speedMultiplier:1});renderFacilities();}});
+$("savePreset").addEventListener("click",savePreset);
+$("loadPreset").addEventListener("click",loadPreset);
+$("deletePreset").addEventListener("click",deletePreset);
+$("addFacility").addEventListener("click",()=>{if(facilityRows.length<20){facilityRows.push({count:1,speedMultiplier:1});renderFacilities();}});
 $("reset").addEventListener("click",()=>{targets.clear();completed.clear();$("search").value="";$("facilityGroups").replaceChildren();facilityRows=[{count:1,speedMultiplier:1}];renderAll();});
 renderAll();
 })();</script>
