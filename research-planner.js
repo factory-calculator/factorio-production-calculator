@@ -111,14 +111,21 @@
       throw new Error("Select at least one target technology");
     }
     const dataset = normalizeDataset(input, request.edition);
-    const researchFacilityCount = request.researchFacilityCount == null ? 1 : Number(request.researchFacilityCount);
-    const researchSpeedMultiplier = request.researchSpeedMultiplier == null ? 1 : Number(request.researchSpeedMultiplier);
-    if (!Number.isInteger(researchFacilityCount) || researchFacilityCount < 1 || researchFacilityCount > 10000) {
-      throw new Error("Research facility count must be an integer from 1 to 10000");
-    }
-    if (!Number.isFinite(researchSpeedMultiplier) || researchSpeedMultiplier < 0.01 || researchSpeedMultiplier > 1000) {
-      throw new Error("Research speed multiplier must be from 0.01 to 1000");
-    }
+    const facilityInput = Array.isArray(request.researchFacilities) && request.researchFacilities.length
+      ? request.researchFacilities
+      : [{ count: request.researchFacilityCount == null ? 1 : request.researchFacilityCount, speedMultiplier: request.researchSpeedMultiplier == null ? 1 : request.researchSpeedMultiplier }];
+    if (facilityInput.length > 20) throw new Error("At most 20 research facility groups are allowed");
+    let researchFacilityCount = 0, totalResearchSpeed = 0;
+    const researchFacilities = facilityInput.map((facility, index) => {
+      const count = Number(facility && facility.count);
+      const speedMultiplier = Number(facility && facility.speedMultiplier);
+      if (!Number.isInteger(count) || count < 1 || count > 10000) throw new Error("Research facility count must be an integer from 1 to 10000 (group " + (index + 1) + ")");
+      if (!Number.isFinite(speedMultiplier) || speedMultiplier < 0.01 || speedMultiplier > 1000) throw new Error("Research speed multiplier must be from 0.01 to 1000 (group " + (index + 1) + ")");
+      researchFacilityCount += count;
+      totalResearchSpeed += count * speedMultiplier;
+      return { count, speedMultiplier };
+    });
+    if (researchFacilityCount > 10000 || !Number.isFinite(totalResearchSpeed)) throw new Error("Total research facility count exceeds the limit");
     const completed = new Set(Array.isArray(request.completed) ? request.completed : []);
     const currentLevels = request.currentLevels == null ? {} : request.currentLevels;
     if (!currentLevels || typeof currentLevels !== "object" || Array.isArray(currentLevels)) {
@@ -205,9 +212,11 @@
       totalResearchSeconds,
       totalResearchHours: totalResearchSeconds / 3600,
       researchFacilityCount,
-      researchSpeedMultiplier,
-      estimatedResearchSeconds: totalResearchSeconds / (researchFacilityCount * researchSpeedMultiplier),
-      estimatedResearchHours: totalResearchSeconds / (researchFacilityCount * researchSpeedMultiplier * 3600),
+      researchSpeedMultiplier: totalResearchSpeed / researchFacilityCount,
+      totalResearchSpeed,
+      researchFacilities,
+      estimatedResearchSeconds: totalResearchSeconds / totalResearchSpeed,
+      estimatedResearchHours: totalResearchSeconds / (totalResearchSpeed * 3600),
       conditions,
       excludedTechnologyCount: dataset.excludedCount
     };
