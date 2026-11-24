@@ -53,6 +53,8 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
         <option value="ja">日本語</option><option value="en">English</option><option value="zh-CN">简体中文</option>
       </select>
     </label>
+    <label><span id="facilityLabel">研究施設数</span><input id="facilityCount" type="number" min="1" max="10000" step="1" value="1" inputmode="numeric" style="width:100px"></label>
+    <label><span id="speedLabel">研究速度倍率</span><input id="researchSpeed" type="number" min="0.01" max="1000" step="0.1" value="1" inputmode="decimal" style="width:100px"></label>
     <button id="reset" class="secondary" type="button">リセット</button>
   </section>
 
@@ -79,6 +81,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;p
     </div>
     <div id="error" aria-live="polite"></div>
     <div id="summary"></div>
+    <p class="muted" id="estimateNote">全施設が常時稼働し、研究対象を並行処理する理論値です。</p>
     <div>
       <h3 id="orderTitle">研究順序と必要量</h3>
       <div id="orderTable"></div>
