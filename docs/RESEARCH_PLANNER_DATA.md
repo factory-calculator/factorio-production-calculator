@@ -9,7 +9,13 @@ The planner engine deliberately separates calculation logic from game-version da
   "schemaVersion": 1,
   "edition": "base",
   "gameVersion": "2.0.x",
-  "source": "Permitted source and attribution",
+  "provenance": {
+    "sourceName": "Permitted source name",
+    "sourceUrl": "https://example.com/source",
+    "retrievedAt": "YYYY-MM-DD",
+    "permissionStatus": "approved",
+    "permissionReference": "Written permission record reference"
+  },
   "technologies": [
     {
       "id": "stable-technology-id",
