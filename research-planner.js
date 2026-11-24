@@ -111,6 +111,14 @@
       throw new Error("Select at least one target technology");
     }
     const dataset = normalizeDataset(input, request.edition);
+    const researchFacilityCount = request.researchFacilityCount == null ? 1 : Number(request.researchFacilityCount);
+    const researchSpeedMultiplier = request.researchSpeedMultiplier == null ? 1 : Number(request.researchSpeedMultiplier);
+    if (!Number.isInteger(researchFacilityCount) || researchFacilityCount < 1 || researchFacilityCount > 10000) {
+      throw new Error("Research facility count must be an integer from 1 to 10000");
+    }
+    if (!Number.isFinite(researchSpeedMultiplier) || researchSpeedMultiplier < 0.01 || researchSpeedMultiplier > 1000) {
+      throw new Error("Research speed multiplier must be from 0.01 to 1000");
+    }
     const completed = new Set(Array.isArray(request.completed) ? request.completed : []);
     const currentLevels = request.currentLevels == null ? {} : request.currentLevels;
     if (!currentLevels || typeof currentLevels !== "object" || Array.isArray(currentLevels)) {
@@ -196,6 +204,10 @@
       totalUnits,
       totalResearchSeconds,
       totalResearchHours: totalResearchSeconds / 3600,
+      researchFacilityCount,
+      researchSpeedMultiplier,
+      estimatedResearchSeconds: totalResearchSeconds / (researchFacilityCount * researchSpeedMultiplier),
+      estimatedResearchHours: totalResearchSeconds / (researchFacilityCount * researchSpeedMultiplier * 3600),
       conditions,
       excludedTechnologyCount: dataset.excludedCount
     };
