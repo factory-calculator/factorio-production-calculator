@@ -48,6 +48,26 @@ const cases = [
     copy.gameVersion = "2.0.x";
     assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /gameVersion/);
   }],
+  ["approved data must include a permission reference", () => {
+    const copy = structuredClone(valid);
+    copy.provenance.permissionStatus = "approved";
+    assert.throws(() => intake.validate(copy), /permissionReference/);
+    copy.provenance.permissionReference = "Written permission email, 2026-11-24";
+    assert.equal(intake.validate(copy).permissionStatus, "approved");
+  }],
+  ["invalid calendar dates and malformed HTTPS URLs are rejected", () => {
+    const copy = structuredClone(valid);
+    copy.provenance.retrievedAt = "2026-02-31";
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /real YYYY-MM-DD/);
+    copy.provenance.retrievedAt = "2026-11-22";
+    copy.provenance.sourceUrl = "https://";
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /valid HTTPS/);
+  }],
+  ["prerequisites must be valid string IDs", () => {
+    const copy = structuredClone(valid);
+    copy.technologies[0].prerequisites = [42];
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /valid technology IDs/);
+  }],
   ["provenance URL and retrieval date are validated", () => {
     const copy = structuredClone(valid);
     copy.provenance.sourceUrl = "http://example.invalid";
