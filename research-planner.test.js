@@ -54,6 +54,22 @@ check("multiple targets aggregate science packs and research work", () => {
   assert.equal(r.totalUnits, 30);
   assert.equal(r.totalResearchSeconds, 250);
 });
+check("facility count and research speed scale estimated elapsed time", () => {
+  const r = planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilityCount: 5, researchSpeedMultiplier: 2 });
+  assert.equal(r.totalResearchSeconds, 250);
+  assert.equal(r.estimatedResearchSeconds, 25);
+  assert.equal(r.estimatedResearchHours, 25 / 3600);
+  assert.equal(r.researchFacilityCount, 5);
+  assert.equal(r.researchSpeedMultiplier, 2);
+  const defaults = planner.plan(base, { edition: "base", targets: [{ id: "logistics" }] });
+  assert.equal(defaults.estimatedResearchSeconds, 250);
+});
+check("invalid facility count and research speed are rejected", () => {
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilityCount: 0 }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchFacilityCount: 1.5 }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchSpeedMultiplier: 0 }));
+  assert.throws(() => planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], researchSpeedMultiplier: 1001 }));
+});
 check("completed prerequisite is not charged again", () => {
   const r = planner.plan(base, { edition: "base", targets: [{ id: "logistics" }], completed: ["automation"] });
   assert.deepEqual(r.technologies.map(x => x.id), ["logistics"]);
