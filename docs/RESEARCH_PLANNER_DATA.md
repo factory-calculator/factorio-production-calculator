@@ -25,6 +25,7 @@ The planner engine deliberately separates calculation logic from game-version da
         "zh-CN": "简体中文名称"
       },
       "category": "production",
+      "policyReview": "approved",
       "prerequisites": [],
       "researchType": "science",
       "timeSeconds": 30,
@@ -42,8 +43,8 @@ The planner engine deliberately separates calculation logic from game-version da
 - Use `edition: "base"` for Base Game and `edition: "spaceage"` for Space Age. Never mix the two datasets.
 - Use `maxLevel: "infinite"` and `countFormula` for level-scaled infinite research; formulas may use only `L`, numbers, parentheses, and arithmetic operators.
 - Use `researchType: "condition"` with a descriptive `condition` or `researchTrigger` for unlocks that do not consume science packs.
-- Mark disallowed categories with `category: "combat"` or `policyExcluded: true`. The engine also omits every technology that depends on an excluded technology.
-- Hidden and disabled entries are not offered to users.
+- Every included technology must have a non-empty `category` and `policyReview: "approved"` after manual review.
+- Do not include restricted-category, policy-excluded, hidden, or disabled entries. The intake validator rejects them, and rejects any dataset that retains technologies depending on excluded entries.
 - Localized names are data, not UI strings; the interface itself must also be translated into Japanese, English, and Simplified Chinese.
 
 ## Engine API
