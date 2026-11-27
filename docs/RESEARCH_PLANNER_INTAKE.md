@@ -14,6 +14,8 @@ Every future Base Game and Space Age dataset must be stored separately and inclu
 
 A production dataset is accepted only when `provenance.permissionStatus` is `approved`. The validator allows `test-fixture` only when tests explicitly pass `{ allowTestFixture: true }`. A pending dataset is rejected.
 
+Every technology must carry a non-empty category and `policyReview: "approved"`. The intake validator rejects restricted categories (combat, military, weapon, weapons), explicit exclusions, hidden/disabled entries, and any remaining technology that depends on an excluded entry. Review uncertain categories manually and omit them rather than guessing.
+
 ## Validation
 
 Load `research-planner-data.js` and call:
