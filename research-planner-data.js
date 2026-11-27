@@ -32,10 +32,16 @@
     if (p.permissionStatus === "approved" && (typeof p.permissionReference !== "string" || !p.permissionReference.trim())) fail("Approved datasets require provenance.permissionReference");
     if (!Array.isArray(input.technologies)) fail("technologies must be an array");
     const byId = new Map();
+    const restrictedCategories = new Set(["combat", "military", "weapon", "weapons"]);
     for (const tech of input.technologies) {
       if (!tech || typeof tech.id !== "string" || !ID_PATTERN.test(tech.id)) fail("Invalid technology id");
       if (byId.has(tech.id)) fail("Duplicate technology id: " + tech.id);
       byId.set(tech.id, tech);
+      if (tech.policyReview !== "approved") fail("Technology requires an explicit policyReview approval: " + tech.id);
+      const category = typeof tech.category === "string" ? tech.category.trim().toLowerCase() : "";
+      if (!category || restrictedCategories.has(category) || tech.policyExcluded === true || tech.hidden === true || tech.enabled === false) {
+        fail("Technology is not eligible for the research dataset: " + tech.id);
+      }
       if (!tech.name || typeof tech.name !== "object" || Array.isArray(tech.name)) fail("Localized names are required for " + tech.id);
       for (const locale of LOCALES) if (typeof tech.name[locale] !== "string" || !tech.name[locale].trim()) fail("Missing " + locale + " name for " + tech.id);
       if (!Array.isArray(tech.prerequisites) || tech.prerequisites.some(id => typeof id !== "string" || !ID_PATTERN.test(id))) fail("prerequisites must contain valid technology IDs for " + tech.id);
@@ -59,6 +65,26 @@
       if (!byId.has(prereq)) fail("Unknown prerequisite " + prereq + " for " + tech.id);
       if (prereq === tech.id) fail("Technology cannot depend on itself: " + tech.id);
     }
+    // A safe dataset must be pre-filtered: do not ship restricted entries or
+    // any technology whose prerequisite chain contains one.
+    const restricted = new Set();
+    for (const tech of byId.values()) {
+      const category = String(tech.category || "").trim().toLowerCase();
+      if (["combat", "military", "weapon", "weapons"].includes(category) || tech.policyExcluded === true || tech.hidden === true || tech.enabled === false) {
+        restricted.add(tech.id);
+      }
+    }
+    let restrictedChanged = true;
+    while (restrictedChanged) {
+      restrictedChanged = false;
+      for (const tech of byId.values()) {
+        if (!restricted.has(tech.id) && tech.prerequisites.some(id => restricted.has(id))) {
+          restricted.add(tech.id);
+          restrictedChanged = true;
+        }
+      }
+    }
+    if (restricted.size) fail("Dataset contains restricted or dependent technologies; remove them before release");
     const visiting = new Set(), visited = new Set();
     function visit(id) {
       if (visiting.has(id)) fail("Circular prerequisite dependency at " + id);
