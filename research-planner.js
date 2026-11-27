@@ -80,6 +80,14 @@
     for (const tech of all.values()) {
       const prerequisites = tech.prerequisites == null ? [] : tech.prerequisites;
       if (!Array.isArray(prerequisites)) throw new Error("Prerequisites must be an array for " + tech.id);
+      if (new Set(prerequisites).size !== prerequisites.length) {
+        throw new Error("Duplicate prerequisite for " + tech.id);
+      }
+      for (const prerequisiteId of prerequisites) {
+        if (typeof prerequisiteId !== "string" || !all.has(prerequisiteId)) {
+          throw new Error("Unknown prerequisite for " + tech.id);
+        }
+      }
       if (tech.policyExcluded === true || tech.category === "combat" || tech.hidden === true || tech.enabled === false) {
         blocked.add(tech.id);
       }
