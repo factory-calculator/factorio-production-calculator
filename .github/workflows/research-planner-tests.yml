@@ -1,0 +1,22 @@
+name: Research planner tests
+
+on:
+  push:
+    branches:
+      - feature/research-planner
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  research-planner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check JavaScript syntax
+        run: node --check research-planner.js && node --check research-planner-data.js && node --check research-planner-preview.js
+      - name: Run research planner tests
+        run: node research-planner.test.js && node research-planner-data.test.js
