@@ -16,6 +16,7 @@ const valid = {
     id: "fixture-tech",
     name: { ja: "架空技術", en: "Fictional technology", "zh-CN": "虚构科技" },
     category: "production",
+    policyReview: "approved",
     prerequisites: [],
     researchType: "science",
     timeSeconds: 30,
@@ -26,6 +27,39 @@ const valid = {
 };
 
 const cases = [
+  ["policy review approval is required for every technology", () => {
+    const copy = structuredClone(valid);
+    delete copy.technologies[0].policyReview;
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /policyReview approval/);
+  }],
+  ["restricted categories and excluded entries are rejected", () => {
+    for (const category of ["combat", "military", "weapon", "weapons"]) {
+      const copy = structuredClone(valid);
+      copy.technologies[0].category = category;
+      assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /not eligible/);
+    }
+    const excluded = structuredClone(valid);
+    excluded.technologies[0].policyExcluded = true;
+    assert.throws(() => intake.validate(excluded, { allowTestFixture: true }), /not eligible/);
+  }],
+  ["dependent technologies are rejected when their prerequisite is excluded", () => {
+    const copy = structuredClone(valid);
+    copy.technologies.push({
+      id: "dependent-tech",
+      name: { ja: "派生技術", en: "Dependent technology", "zh-CN": "依赖科技" },
+      category: "production",
+      policyReview: "approved",
+      prerequisites: ["fixture-tech"],
+      researchType: "science",
+      timeSeconds: 30,
+      unitCount: 10,
+      maxLevel: 1,
+      sciencePacks: [{ id: "fixture-pack", amountPerUnit: 1 }]
+    });
+    copy.technologies[0].category = "combat";
+    // A restricted record is rejected before any release dataset can be accepted.
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /not eligible/);
+  }],
   ["valid fixture is accepted only in test mode", () => {
     assert.equal(intake.validate(valid, { allowTestFixture: true }).valid, true);
     assert.throws(() => intake.validate(valid), /permissionStatus/);
