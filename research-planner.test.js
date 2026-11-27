@@ -135,6 +135,29 @@ check("empty target selection is rejected", () => {
   assert.throws(() => planner.plan(base, { edition: "base", targets: [] }));
 });
 
+check("unknown prerequisites are rejected even when the dependent entry is filtered", () => {
+  const malformed = {
+    schemaVersion: 1,
+    edition: "base",
+    technologies: [
+      { id: "filtered-entry", policyExcluded: true, prerequisites: ["missing-entry"] }
+    ]
+  };
+  assert.throws(() => planner.normalizeDataset(malformed), /Unknown prerequisite/);
+});
+
+check("duplicate prerequisite references are rejected", () => {
+  const malformed = {
+    schemaVersion: 1,
+    edition: "base",
+    technologies: [
+      { id: "root", prerequisites: [] },
+      { id: "target", prerequisites: ["root", "root"] }
+    ]
+  };
+  assert.throws(() => planner.normalizeDataset(malformed), /Duplicate prerequisite/);
+});
+
 check("standalone preview contains syntactically valid bundled scripts", () => {
   const html = fs.readFileSync("research-planner-preview-standalone.html", "utf8");
   const scripts = html.split("<script>").slice(1).map(part => part.split("</script>")[0]);
