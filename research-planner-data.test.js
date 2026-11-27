@@ -42,23 +42,10 @@ const cases = [
     excluded.technologies[0].policyExcluded = true;
     assert.throws(() => intake.validate(excluded, { allowTestFixture: true }), /not eligible/);
   }],
-  ["dependent technologies are rejected when their prerequisite is excluded", () => {
+  ["dependent entries cannot remain after an excluded prerequisite is removed", () => {
     const copy = structuredClone(valid);
-    copy.technologies.push({
-      id: "dependent-tech",
-      name: { ja: "派生技術", en: "Dependent technology", "zh-CN": "依赖科技" },
-      category: "production",
-      policyReview: "approved",
-      prerequisites: ["fixture-tech"],
-      researchType: "science",
-      timeSeconds: 30,
-      unitCount: 10,
-      maxLevel: 1,
-      sciencePacks: [{ id: "fixture-pack", amountPerUnit: 1 }]
-    });
-    copy.technologies[0].category = "combat";
-    // A restricted record is rejected before any release dataset can be accepted.
-    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /not eligible/);
+    copy.technologies[0].prerequisites = ["excluded-prerequisite"];
+    assert.throws(() => intake.validate(copy, { allowTestFixture: true }), /Unknown prerequisite/);
   }],
   ["valid fixture is accepted only in test mode", () => {
     assert.equal(intake.validate(valid, { allowTestFixture: true }).valid, true);
@@ -119,6 +106,7 @@ const cases = [
     const copy = structuredClone(valid);
     copy.technologies.push({
       id: "second-tech", name: { ja: "二番", en: "Second", "zh-CN": "第二" },
+      category: "production", policyReview: "approved",
       prerequisites: ["fixture-tech"], timeSeconds: 1, unitCount: 1,
       sciencePacks: [{ id: "fixture-pack", amountPerUnit: 1 }]
     });
